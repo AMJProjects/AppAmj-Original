@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.amjsecurityfire.amjsecurityfire">
+
+    <!-- Permissões necessárias -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.APPAMJ"
+        tools:targetApi="31"
+        android:requestLegacyExternalStorage="true">
+
+    <!-- Menu Principal Activity -->
+    <activity
+        android:name="com.amjsecurityfire.amjsecurityfire.MenuPrincipalActivity"
+        android:exported="true" />
+
+    <!-- Tela de Recuperação de Senha -->
+    <activity
+        android:name="com.amjsecurityfire.amjsecurityfire.EsqueciSenhaActivity"
+        android:exported="false" />
+
+    <!-- Tela de Login (Principal) -->
+    <activity
+        android:name="com.amjsecurityfire.amjsecurityfire.MainActivity"
+        android:exported="true"
+        android:label="@string/app_name"
+        android:theme="@style/Theme.APPAMJ">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+    </activity>
+
+    <activity android:name="com.amjsecurityfire.amjsecurityfire.RegistroActivity" />
+    <activity android:name=".AdicionarEscopoActivity" />
+    <activity android:name=".EscoposPendentesActivity" />
+    <activity android:name=".EscoposConcluidosActivity" />
+    <activity android:name=".PerfilActivity" />
+    <activity android:name=".EditarPerfilActivity" />
+    <activity android:name=".DetalhesEscopoActivity" />
+    <activity android:name=".EditarEscopoActivity" />
+    <activity android:name=".HistoricosEscoposActivity" />
+
+
+    <!-- Nova Tela de Escopos Excluídos -->
+    <activity android:name=".EscoposExcluidosActivity" />
+
+    </application>
+
+</manifest>

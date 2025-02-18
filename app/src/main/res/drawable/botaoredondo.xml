@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Cor de fundo branca -->
+    <solid android:color="#FFFFFF"/>
+
+    <!-- Arredondando as bordas -->
+    <corners android:radius="20dp"/>
+
+    <!-- Borda de 1dp com cor cinza clara -->
+    <stroke android:color="#DCDCDC"
+        android:width="1dp"/>
+</shape>

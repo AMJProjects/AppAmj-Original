@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1073144744553",
+    "project_id": "amj-security-fire",
+    "storage_bucket": "amj-security-fire.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1073144744553:android:7db07ccd1792801c04b0f8",
+        "android_client_info": {
+          "package_name": "com.amjsecurityfire.amjsecurityfire"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCruEziL_l_tJR6TsL8IDS4Bu1kj0nG89s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_escopos">
+
+    <Button
+        android:id="@+id/btn_pendente"
+        android:layout_width="259dp"
+        android:layout_height="93dp"
+        android:layout_marginTop="272dp"
+        android:background="@drawable/botaoredondo"
+        android:backgroundTint="#4C0000"
+        android:text="Escopos Pendentes"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btn_add_escopo"
+        android:layout_width="259dp"
+        android:layout_height="93dp"
+        android:layout_marginTop="52dp"
+        android:background="@drawable/botaoredondo"
+        android:backgroundTint="#AB0000"
+        android:text="Adicionar um escopo"
+        android:textColor="#FDFDFD"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_pendente"
+        tools:ignore="MissingConstraints" />
+
+    <ImageButton
+        android:id="@+id/perfil"
+        android:layout_width="64dp"
+        android:layout_height="61dp"
+        android:layout_marginTop="28dp"
+        android:background="@drawable/botaoredondo"
+        android:backgroundTint="#4C0000"
+        android:contentDescription="Perfil"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toTopOf="@+id/button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.902"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.179"
+        app:srcCompat="@drawable/icon_perfil"
+        tools:ignore="MissingConstraints,UnknownId" />
+
+    <Button
+        android:id="@+id/btn_concluido"
+        android:layout_width="259dp"
+        android:layout_height="93dp"
+        android:layout_marginTop="52dp"
+        android:background="@drawable/botaoredondo"
+        android:backgroundTint="#7C0101"
+        android:text="Escopos Concluídos"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_add_escopo"
+        app:layout_constraintVertical_bias="0.008" />
+
+    <ImageButton
+        android:id="@+id/btn_lixo"
+        android:layout_width="67dp"
+        android:layout_height="58dp"
+        android:backgroundTint="#FDFDFD"
+        android:contentDescription="Excluir escopo"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.084"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_concluido"
+        app:layout_constraintVertical_bias="0.823"
+        app:srcCompat="@drawable/icon_lixo" />
+
+    <ImageButton
+        android:id="@+id/btn_historico"
+        android:layout_width="67dp"
+        android:layout_height="60dp"
+        android:backgroundTint="#4C0000"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toTopOf="@+id/btn_pendente"
+        app:layout_constraintEnd_toStartOf="@+id/perfil"
+        app:layout_constraintHorizontal_bias="0.191"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.136"
+        app:srcCompat="@drawable/icon_fichario" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
