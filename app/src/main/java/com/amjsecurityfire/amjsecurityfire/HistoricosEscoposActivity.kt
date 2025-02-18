@@ -31,7 +31,7 @@ public class HistoricosEscoposActivity : AppCompatActivity(){
                 .get()
                 .addOnSuccessListener { querySnapshot ->
             for (document in querySnapshot) {
-                val numeroEscopo = document.getString("numeroEscopo") ?: "Desconhecido"
+                val numeroEscopo = document.get("numeroEscopo")?.toString() ?: "Desconhecido"
                 val acao = document.getString("acao") ?: "Ação desconhecida"
                 val usuario = document.getString("usuario") ?: "Usuário desconhecido"
                 val data = document.getString("data") ?: "Data desconhecida"
