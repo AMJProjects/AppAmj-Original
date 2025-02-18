@@ -307,11 +307,11 @@ public class AdicionarEscopoActivity : AppCompatActivity(){
             }
         } else {
             escoposCollection.add(novoEscopo)
-                    .addOnSuccessListener { documentReference ->
+                .addOnSuccessListener { documentReference ->
                     Toast.makeText(this, "Escopo salvo com sucesso!", Toast.LENGTH_SHORT).show()
-                registrarHistoricoEscopo(documentReference.id, usuarioNome, "Criado", dataCriacao) // Registrar histórico de criação
-                finish()
-            }
+                    registrarHistoricoEscopo(documentReference.id, usuarioNome, "Criado", dataCriacao) // Registrar histórico de criação
+                    finish()
+                }
                 .addOnFailureListener { e ->
                     Toast.makeText(this, "Erro ao salvar o escopo: ${e.message}", Toast.LENGTH_SHORT).show()
             }

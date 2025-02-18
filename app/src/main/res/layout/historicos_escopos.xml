@@ -43,6 +43,8 @@
         android:layout_height="594dp"
         android:divider="@android:color/darker_gray"
         android:dividerHeight="1dp"
+        android:padding="8dp"
+        android:layout_margin="8dp"
         app:layout_constraintBottom_toTopOf="@+id/button4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.485"
