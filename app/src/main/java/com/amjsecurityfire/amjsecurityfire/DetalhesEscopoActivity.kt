@@ -38,6 +38,8 @@ public class DetalhesEscopoActivity : AppCompatActivity(){
         var resumoEscopo = intent.getStringExtra("resumoEscopo") ?: "N/A"
         var numeroPedidoCompra = intent.getStringExtra("numeroPedidoCompra") ?: "N/A"
         val pdfUrl = intent.getStringExtra("pdfUrl") ?: ""
+        var criadorNome = intent.getStringExtra("criadorNome") ?: "N/A"
+        var dataCriacao = intent.getStringExtra("dataCriacao") ?: "N/A"
 
         textViewDetalhes.text = """
             Número: $numeroEscopo
@@ -47,6 +49,8 @@ public class DetalhesEscopoActivity : AppCompatActivity(){
             Status: $status
             Resumo: $resumoEscopo
             Número do Pedido de Compra: $numeroPedidoCompra
+            Criado por: $criadorNome
+            Data de Criação: $dataCriacao
         """.trimIndent()
 
         // Botão para editar escopo

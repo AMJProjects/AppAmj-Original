@@ -66,20 +66,20 @@ public class EscoposPendentesActivity : AppCompatActivity(){
 
     private fun carregarEscoposPendentes() {
         db.collection("escoposPendentes")
-                .orderBy("numeroEscopo", Query.Direction.ASCENDING)
-                .addSnapshotListener { snapshots, error ->
-            if (error != null) {
-                Toast.makeText(this@EscoposPendentesActivity, "Erro ao carregar escopos.", Toast.LENGTH_SHORT).show()
-                return@addSnapshotListener
-            }
-            escoposList.clear()
-            containerPendentes.removeAllViews()
+            .orderBy("numeroEscopo", Query.Direction.ASCENDING)
+            .addSnapshotListener { snapshots, error ->
+                if (error != null) {
+                    Toast.makeText(this@EscoposPendentesActivity, "Erro ao carregar escopos.", Toast.LENGTH_SHORT).show()
+                    return@addSnapshotListener
+                }
+                escoposList.clear()
+                containerPendentes.removeAllViews()
 
-            snapshots?.let {
-                for (document in it) {
-                    val escopo = mapOf(
+                snapshots?.let {
+                    for (document in it) {
+                        val escopo = hashMapOf(
                             "numeroEscopo" to (document.getLong("numeroEscopo")?.toString() ?: ""),
-                    "empresa" to document.getString("empresa").orEmpty(),
+                            "empresa" to document.getString("empresa").orEmpty(),
                             "dataEstimativa" to document.getString("dataEstimativa").orEmpty(),
                             "status" to document.getString("status").orEmpty(),
                             "tipoServico" to document.getString("tipoServico").orEmpty(),
@@ -87,13 +87,14 @@ public class EscoposPendentesActivity : AppCompatActivity(){
                             "numeroPedidoCompra" to document.getString("numeroPedidoCompra").orEmpty(),
                             "escopoId" to document.id,
                             "pdfUrl" to document.getString("pdfUrl").orEmpty(),
-                            "criador" to nomeUsuario
+                            "criadorNome" to document.getString("criadorNome").orEmpty(),
+                            "dataCriacao" to document.getString("dataCriacao").orEmpty()
                         )
-                    escoposList.add(escopo)
-                    adicionarTextoDinamico(escopo)
+                        escoposList.add(escopo)
+                        adicionarTextoDinamico(escopo)
+                    }
                 }
             }
-        }
     }
 
     private fun carregarNomeUsuario() {
@@ -181,7 +182,7 @@ public class EscoposPendentesActivity : AppCompatActivity(){
         Empresa: ${escopo["empresa"]}
         Data Estimada: ${escopo["dataEstimativa"]}
         Status: ${escopo["status"]}
-        Criado por: ${escopo["criador"] ?: "Desconhecido"}
+        Criado por: ${escopo["criadorNome"] ?: "Desconhecido"}
     """.trimIndent()
 
         val textView = TextView(this).apply {

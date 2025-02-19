@@ -51,6 +51,23 @@ public class EscoposConcluidosActivity : AppCompatActivity(){
                 return true
             }
         })
+
+        // Configuração do SearchView
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                filtrarEscopos(query)
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                if (newText.isNullOrEmpty()) {
+                    carregarEscoposConcluidos() // Recarrega todos os escopos quando a busca é apagada
+                } else {
+                    filtrarEscopos(newText)
+                }
+                return true
+            }
+        })
     }
 
     private fun carregarEscoposConcluidos() {
@@ -66,7 +83,7 @@ public class EscoposConcluidosActivity : AppCompatActivity(){
 
             snapshots?.let {
                 for (document in it) {
-                    val escopo = mapOf(
+                    val escopo = hashMapOf(
                             "numeroEscopo" to (document.getLong("numeroEscopo")?.toString() ?: ""),
                     "empresa" to document.getString("empresa").orEmpty(),
                             "dataEstimativa" to document.getString("dataEstimativa").orEmpty(),
@@ -76,7 +93,8 @@ public class EscoposConcluidosActivity : AppCompatActivity(){
                             "numeroPedidoCompra" to document.getString("numeroPedidoCompra").orEmpty(),
                             "escopoId" to document.id,
                             "pdfUrl" to document.getString("pdfUrl").orEmpty(),
-                            "criador" to nomeUsuario
+                            "criadorNome" to document.getString("criadorNome").orEmpty(),
+                            "dataCriacao" to document.getString("dataCriacao").orEmpty()
                         )
                     escoposList.add(escopo)
                     adicionarTextoDinamico(escopo)
@@ -163,7 +181,7 @@ public class EscoposConcluidosActivity : AppCompatActivity(){
         Empresa: ${escopo["empresa"]}
         Data Estimada: ${escopo["dataEstimativa"]}
         Status: ${escopo["status"]}
-        Criado por: ${escopo["criador"] ?: "Desconhecido"}
+        Criado por: ${escopo["criadorNome"] ?: "Desconhecido"}
     """.trimIndent()
 
         val textView = TextView(this).apply {

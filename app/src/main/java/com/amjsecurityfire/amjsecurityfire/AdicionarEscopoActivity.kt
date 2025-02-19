@@ -25,12 +25,17 @@ import android.widget.EditText
 import java.util.Locale
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.Timestamp
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 
 public class AdicionarEscopoActivity : AppCompatActivity(){
     private lateinit var db: FirebaseFirestore
     private lateinit var progressBarContainer: FrameLayout
     private lateinit var progressBar: ProgressBar
     private var ultimoNumeroEscopo: Int = 0
+    private lateinit var usuarioNome: String
     private var pdfUri: Uri? = null
     private val PDF_REQUEST_CODE = 100
 
@@ -60,6 +65,25 @@ public class AdicionarEscopoActivity : AppCompatActivity(){
         progressBarContainer.visibility = View.GONE
         progressBar.visibility = View.GONE
 
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        if (currentUser != null) {
+            val userId = currentUser.uid
+            val databaseReference = FirebaseDatabase.getInstance().getReference("users/$userId")
+
+            databaseReference.child("nome").addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    usuarioNome = snapshot.getValue(String::class.java) ?: "Usuário Desconhecido"
+                    // Agora você pode usar usuarioNome no escopo
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    usuarioNome = "Usuário Desconhecido" // Fallback em caso de erro
+                }
+            })
+        } else {
+            usuarioNome = "Usuário Desconhecido"
+        }
+
         // Recuperar dados do Intent
         val editMode = intent.getBooleanExtra("editMode", false)
         val escopoId = intent.getStringExtra("escopoId")
@@ -73,12 +97,20 @@ public class AdicionarEscopoActivity : AppCompatActivity(){
 
         // Referenciar os campos do layout
         val empresaField = findViewById<EditText>(R.id.editTextText3)
-                val tipoServicoSpinner = findViewById<Spinner>(R.id.spinnerTipoManutencao)
-                val statusSpinner = findViewById<Spinner>(R.id.spinnerTipoManutencao2)
-                val resumoField = findViewById<EditText>(R.id.textInputEditText)
-                val numeroPedidoField = findViewById<EditText>(R.id.editTextNumber2)
+        val tipoServicoSpinner = findViewById<Spinner>(R.id.spinnerTipoManutencao)
+        val statusSpinner = findViewById<Spinner>(R.id.spinnerTipoManutencao2)
+        val resumoField = findViewById<EditText>(R.id.textInputEditText)
+        val numeroPedidoField = findViewById<EditText>(R.id.editTextNumber2)
 
-                salvarButton = findViewById(R.id.button3)
+        // Obter o usuário autenticado
+        val usuarioNome = currentUser?.displayName ?: "Usuário Desconhecido"
+
+        // Formatar a data no formato "dd/MM/yyyy"
+        val timeZone = TimeZone.getTimeZone("America/Sao_Paulo")
+        val calendario = Calendar.getInstance(timeZone)
+        val dataCriacao = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(calendario.time)
+
+        salvarButton = findViewById(R.id.button3)
         cancelarButton = findViewById(R.id.button5)
         attachPdfButton = findViewById(R.id.buttonAttachPdf)
         pdfStatusTextView = findViewById(R.id.textViewPdfStatus)
@@ -186,8 +218,6 @@ public class AdicionarEscopoActivity : AppCompatActivity(){
             // Verificar campos obrigatórios
             if (empresa.isEmpty() || dataEstimativa.isEmpty() || resumo.isEmpty() || numeroPedidoCompra.isEmpty()) {
                 Toast.makeText(this, "Preencha todos os campos obrigatórios.", Toast.LENGTH_SHORT).show()
-
-                // Esconder ProgressBar e a tela embaçada
                 toggleProgress(false)
                 return@setOnClickListener
             }
@@ -195,8 +225,6 @@ public class AdicionarEscopoActivity : AppCompatActivity(){
             // Verificar se o PDF foi anexado
             if (pdfUri == null) {
                 Toast.makeText(this, "Por favor, anexe um arquivo PDF antes de salvar.", Toast.LENGTH_SHORT).show()
-
-                // Esconder ProgressBar e a tela embaçada
                 toggleProgress(false)
                 return@setOnClickListener
             }
@@ -204,51 +232,58 @@ public class AdicionarEscopoActivity : AppCompatActivity(){
             // Verificar conexão com a internet
             if (!isInternetAvailable()) {
                 Toast.makeText(this, "Sem conexão com a internet.", Toast.LENGTH_SHORT).show()
-
-                // Esconder ProgressBar e a tela embaçada
                 toggleProgress(false)
                 return@setOnClickListener
             }
 
             // Iniciar o upload do PDF
             uploadPdfToStorage(
-                    onSuccess = { pdfDownloadUrl ->
-                            val finalPdfDownloadUrl = pdfDownloadUrl ?: ""
+                onSuccess = { pdfDownloadUrl ->
+                    val finalPdfDownloadUrl = pdfDownloadUrl ?: ""
 
-            // Determinar o número do escopo
-            val numeroEscopoAtual = if (editMode && numeroEscopoEdit != null) {
-                numeroEscopoEdit.toInt()
-            } else {
-                ultimoNumeroEscopo + 1
-            }
+                    // Determinar o número do escopo
+                    val numeroEscopoAtual = if (editMode && numeroEscopoEdit != null) {
+                        numeroEscopoEdit.toInt()
+                    } else {
+                        ultimoNumeroEscopo + 1
+                    }
 
-            // Criar o mapa de dados para o Firestore
-            val novoEscopo = mapOf(
-                    "numeroEscopo" to numeroEscopoAtual,
-                    "empresa" to empresa,
-                    "dataEstimativa" to dataEstimativa,
-                    "tipoServico" to tipoServico,
-                    "status" to status,
-                    "resumoEscopo" to resumo,
-                    "numeroPedidoCompra" to numeroPedidoCompra,
-                    "pdfUrl" to finalPdfDownloadUrl
-            )
+                    // Obter o usuário autenticado
+                    val currentUser = FirebaseAuth.getInstance().currentUser
+                    currentUser?.let {
+                        // Buscar nome do usuário no Realtime Database
+                        buscarNomeUsuario(it.uid) { usuarioNome ->
+                            // Criar o mapa de dados para o Firestore
+                            val novoEscopo = mapOf(
+                                "numeroEscopo" to numeroEscopoAtual,
+                                "empresa" to empresa,
+                                "dataEstimativa" to dataEstimativa,
+                                "tipoServico" to tipoServico,
+                                "status" to status,
+                                "resumoEscopo" to resumo,
+                                "numeroPedidoCompra" to numeroPedidoCompra,
+                                "pdfUrl" to finalPdfDownloadUrl,
+                                "criadorNome" to usuarioNome,
+                                "dataCriacao" to dataCriacao
+                            )
 
-            // Salvar no Firestore
-            salvarNoFirestore(status, novoEscopo, editMode, escopoId)
+                            // Salvar no Firestore
+                            salvarNoFirestore(status, novoEscopo, editMode, escopoId)
 
-            // Esconder ProgressBar e a tela embaçada
-            toggleProgress(false)
+                            // Esconder ProgressBar e a tela embaçada
+                            toggleProgress(false)
+                        }
+                    } ?: run {
+                        Toast.makeText(this, "Usuário não autenticado.", Toast.LENGTH_SHORT).show()
+                        toggleProgress(false)
+                    }
                 },
-            onFailure = { exception ->
+                onFailure = { exception ->
                     Toast.makeText(this, "Erro ao fazer upload do PDF: ${exception.message}", Toast.LENGTH_SHORT).show()
-
-                    // Esconder ProgressBar e a tela embaçada
                     toggleProgress(false)
-            }
+                }
             )
         }
-
 
         // Botão de cancelar
         cancelarButton.setOnClickListener {
@@ -379,6 +414,23 @@ public class AdicionarEscopoActivity : AppCompatActivity(){
             else -> false
         }
     }
+
+    private fun buscarNomeUsuario(uid: String, onComplete: (String) -> Unit) {
+        val database = FirebaseDatabase.getInstance().getReference("users") // Ajuste o caminho conforme a estrutura do seu Realtime Database
+        database.child(uid).child("nome").addListenerForSingleValueEvent(object :
+            ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val nome = snapshot.getValue(String::class.java) ?: "Usuário Desconhecido"
+                onComplete(nome)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("Firebase", "Erro ao buscar nome do usuário: ${error.message}")
+                onComplete("Usuário Desconhecido")
+            }
+        })
+    }
+
 
     private fun buscarUltimoNumeroEscopo(status: String) {
         val collection = if (status == "Concluído") {
