@@ -6,6 +6,20 @@
     android:layout_height="match_parent"
     android:background="@drawable/bg_escopos">
 
+
+    <ImageView
+        android:id="@+id/bottom_background_image"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:background="#4C0000"
+        android:scaleType="fitXY"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_concluido"
+        app:layout_constraintVertical_bias="1.0" />
+
     <Button
         android:id="@+id/btn_pendente"
         android:layout_width="259dp"
@@ -37,19 +51,19 @@
 
     <ImageButton
         android:id="@+id/perfil"
-        android:layout_width="64dp"
-        android:layout_height="61dp"
-        android:layout_marginTop="28dp"
+        android:layout_width="49dp"
+        android:layout_height="58dp"
+        android:layout_marginBottom="12dp"
         android:background="@drawable/botaoredondo"
         android:backgroundTint="#4C0000"
         android:contentDescription="Perfil"
         android:scaleType="fitCenter"
-        app:layout_constraintBottom_toTopOf="@+id/button"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.902"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.179"
+        app:layout_constraintHorizontal_bias="0.864"
+        app:layout_constraintStart_toStartOf="@+id/bottom_background_image"
+        app:layout_constraintTop_toBottomOf="@+id/btn_concluido"
+        app:layout_constraintVertical_bias="0.981"
         app:srcCompat="@drawable/icon_perfil"
         tools:ignore="MissingConstraints,UnknownId" />
 
@@ -71,31 +85,33 @@
 
     <ImageButton
         android:id="@+id/btn_lixo"
-        android:layout_width="67dp"
-        android:layout_height="58dp"
-        android:backgroundTint="#FDFDFD"
+        android:layout_width="60dp"
+        android:layout_height="55dp"
+        android:background="#4C0000"
         android:contentDescription="Excluir escopo"
         android:scaleType="fitCenter"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.084"
+        app:layout_constraintHorizontal_bias="0.094"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btn_concluido"
-        app:layout_constraintVertical_bias="0.823"
+        app:layout_constraintVertical_bias="0.899"
         app:srcCompat="@drawable/icon_lixo" />
 
     <ImageButton
         android:id="@+id/btn_historico"
         android:layout_width="67dp"
         android:layout_height="60dp"
+        android:layout_marginEnd="156dp"
         android:backgroundTint="#4C0000"
         android:scaleType="fitCenter"
-        app:layout_constraintBottom_toTopOf="@+id/btn_pendente"
-        app:layout_constraintEnd_toStartOf="@+id/perfil"
-        app:layout_constraintHorizontal_bias="0.191"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.136"
+        app:layout_constraintBottom_toBottomOf="@+id/bottom_background_image"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.914"
+        app:layout_constraintStart_toStartOf="@+id/bottom_background_image"
+        app:layout_constraintTop_toBottomOf="@+id/btn_concluido"
+        app:layout_constraintVertical_bias="0.925"
         app:srcCompat="@drawable/icon_fichario" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
