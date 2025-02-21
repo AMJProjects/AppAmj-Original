@@ -73,11 +73,10 @@ public class AdicionarEscopoActivity : AppCompatActivity(){
             databaseReference.child("nome").addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     usuarioNome = snapshot.getValue(String::class.java) ?: "Usuário Desconhecido"
-                    // Agora você pode usar usuarioNome no escopo
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    usuarioNome = "Usuário Desconhecido" // Fallback em caso de erro
+                    usuarioNome = "Usuário Desconhecido"
                 }
             })
         } else {

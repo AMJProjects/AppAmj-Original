@@ -17,6 +17,7 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.QuerySnapshot
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
@@ -28,9 +29,8 @@ class EscoposExcluidosActivity : AppCompatActivity() {
     private lateinit var buttonVoltarMenu: Button
     private lateinit var progressBar: ProgressBar
     private lateinit var progressBarContainer: FrameLayout
-    private val escoposList = mutableListOf<Map<String, String>>() // Lista para armazenar os escopos
+    private val escoposList = mutableListOf<Map<String, String>>()
 
-    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.escopos_excluidos)
@@ -42,9 +42,8 @@ class EscoposExcluidosActivity : AppCompatActivity() {
         progressBarContainer = findViewById(R.id.progressBarContainer)
         progressBar = findViewById(R.id.progressBar)
 
-        // Exibe a ProgressBar ao iniciar a tela
         progressBarContainer.visibility = View.VISIBLE
-        buttonVoltarMenu.isEnabled = false // Desabilitar o botão
+        buttonVoltarMenu.isEnabled = false
 
         excluirEscoposAntigos {
             carregarEscoposExcluidos()
@@ -57,108 +56,101 @@ class EscoposExcluidosActivity : AppCompatActivity() {
 
     private fun excluirEscoposAntigos(onComplete: () -> Unit) {
         val calendar = Calendar.getInstance()
-        calendar.add(Calendar.DAY_OF_YEAR, -90) // Define a data limite para exclusão
+        calendar.add(Calendar.DAY_OF_YEAR, -90)
         val dataLimite = Timestamp(calendar.time)
 
         db.collection("escoposExcluidos")
-            .whereLessThan("dataExclusao", dataLimite) // Filtra escopos com mais de 90 dias
+            .whereLessThan("dataExclusao", dataLimite)
             .get()
             .addOnSuccessListener { documents ->
                 val batch = db.batch()
-                for (document in documents) {
-                    batch.delete(document.reference) // Remove cada documento encontrado
-                }
-                batch.commit().addOnCompleteListener {
-                    onComplete() // Após a exclusão, recarrega os escopos
-                }
+                documents.forEach { batch.delete(it.reference) }
+                batch.commit().addOnCompleteListener { onComplete() }
             }
-            .addOnFailureListener { e ->
-                Log.e("Firestore", "Erro ao excluir escopos antigos", e)
+            .addOnFailureListener {
+                Log.e("Firestore", "Erro ao excluir escopos antigos", it)
                 onComplete()
             }
     }
 
     private fun carregarEscoposExcluidos() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-
         val userRef = FirebaseDatabase.getInstance().reference.child("users").child(userId)
+
         userRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val nomeUsuario = snapshot.child("nome").getValue(String::class.java) ?: "Usuário desconhecido"
 
                 db.collection("escoposExcluidos")
                     .orderBy("numeroEscopo", Query.Direction.ASCENDING)
-                    .addSnapshotListener { snapshots, error ->
-                        if (error != null) {
-                            Toast.makeText(this@EscoposExcluidosActivity, "Erro ao carregar escopos.", Toast.LENGTH_SHORT).show()
-                            progressBarContainer.visibility = View.GONE
-                            buttonVoltarMenu.isEnabled = true // Habilitar o botão em caso de erro
-                            return@addSnapshotListener
-                        }
-
-                        escoposList.clear()
-                        containerExcluidos.removeAllViews()
-
-                        var diasMinimos = Int.MAX_VALUE
-
-                        snapshots?.let {
-                            for (document in it) {
-                                val dataExclusaoValue = document.get("dataExclusao")
-                                val diasRestantes = when (dataExclusaoValue) {
-                                    is com.google.firebase.Timestamp -> calcularDiasRestantes(dataExclusaoValue)
-                                    else -> 0
-                                }
-
-                                val numeroEscopo = document.get("numeroEscopo")?.toString()?.toIntOrNull()?.toString() ?: ""
-
-                                val escopo = hashMapOf<String, Any>(
-                                    "numeroEscopo" to numeroEscopo,
-                                    "empresa" to document.getString("empresa").orEmpty(),
-                                    "dataEstimativa" to document.getString("dataEstimativa").orEmpty(),
-                                    "tipoServico" to document.getString("tipoServico").orEmpty(),
-                                    "status" to document.getString("status").orEmpty(),
-                                    "resumoEscopo" to document.getString("resumoEscopo").orEmpty(),
-                                    "numeroPedidoCompra" to document.getString("numeroPedidoCompra").orEmpty(),
-                                    "motivoExclusao" to document.getString("motivoExclusao").orEmpty(),
-                                    "excluidoPor" to (document.getString("excluidoPor") ?: nomeUsuario),
-                                    "escopoId" to document.id,
-                                    "dataExclusao" to Timestamp.now()
-                                )
-                                db.collection("escoposExcluidos").add(escopo)
-
-                                val escopoStringMap = escopo.mapValues { it.value.toString() }
-
-                                Log.d("Firestore", "Escopo carregado: $escopo")
-                                adicionarTextoDinamico(escopoStringMap)
-
-                                if (diasRestantes < diasMinimos) {
-                                    diasMinimos = diasRestantes
-                                }
-                            }
-                        }
-
-                        textDiasRestantes.text = if (diasMinimos != Int.MAX_VALUE) {
-                            "Os escopos excluídos serão removidos permanentemente em $diasMinimos dias."
-                        } else {
-                            "Não há escopos para excluir."
-                        }
-                        progressBarContainer.visibility = View.GONE // Oculta a ProgressBar após o carregamento
-                        buttonVoltarMenu.isEnabled = true // Habilitar o botão após carregar
+                    .limit(10)
+                    .get() // Mudança de addSnapshotListener para get()
+                    .addOnSuccessListener { snapshots ->
+                        processarEscopos(snapshots, nomeUsuario)
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(this@EscoposExcluidosActivity, "Erro ao carregar escopos.", Toast.LENGTH_SHORT).show()
+                        progressBarContainer.visibility = View.GONE
+                        buttonVoltarMenu.isEnabled = true
                     }
             }
 
             override fun onCancelled(error: DatabaseError) {
                 Toast.makeText(this@EscoposExcluidosActivity, "Erro ao carregar dados do usuário.", Toast.LENGTH_SHORT).show()
-                progressBarContainer.visibility = View.GONE // Oculta a ProgressBar em caso de erro
-                buttonVoltarMenu.isEnabled = true // Habilitar o botão em caso de erro
+                progressBarContainer.visibility = View.GONE
+                buttonVoltarMenu.isEnabled = true
             }
         })
     }
 
+    private fun processarEscopos(snapshots: QuerySnapshot, nomeUsuario: String) {
+        escoposList.clear()
+        containerExcluidos.removeAllViews()
+        var diasMinimos = Int.MAX_VALUE
+
+        for (document in snapshots) {
+            val dataExclusaoValue = document.get("dataExclusao")
+            val diasRestantes = when (dataExclusaoValue) {
+                is com.google.firebase.Timestamp -> calcularDiasRestantes(dataExclusaoValue)
+                else -> 0
+            }
+
+            val escopoStringMap = mapOf(
+                "numeroEscopo" to (document.get("numeroEscopo")?.toString()?.toIntOrNull()?.toString() ?: ""),
+                "empresa" to document.getString("empresa").orEmpty(),
+                "dataEstimativa" to document.getString("dataEstimativa").orEmpty(),
+                "tipoServico" to document.getString("tipoServico").orEmpty(),
+                "status" to document.getString("status").orEmpty(),
+                "resumoEscopo" to document.getString("resumoEscopo").orEmpty(),
+                "numeroPedidoCompra" to document.getString("numeroPedidoCompra").orEmpty(),
+                "motivoExclusao" to document.getString("motivoExclusao").orEmpty(),
+                "excluidoPor" to (document.getString("excluidoPor") ?: nomeUsuario),
+                "escopoId" to document.id
+            )
+
+            Log.d("Firestore", "Escopo carregado: $escopoStringMap")
+            adicionarTextoDinamico(escopoStringMap)
+
+            if (diasRestantes < diasMinimos) {
+                diasMinimos = diasRestantes
+            }
+        }
+
+        textDiasRestantes.text = if (diasMinimos != Int.MAX_VALUE) {
+            "Os escopos excluídos serão removidos permanentemente em $diasMinimos dias."
+        } else {
+            "Não há escopos para excluir."
+        }
+
+        progressBarContainer.visibility = View.GONE
+        buttonVoltarMenu.isEnabled = true
+    }
+
+
     private fun calcularDiasRestantes(dataExclusao: com.google.firebase.Timestamp): Int {
         val dataExpiracao = Calendar.getInstance().apply {
             time = dataExclusao.toDate()
-            add(Calendar.DAY_OF_YEAR, 90) // Adiciona 90 dias à data de exclusão
+            add(Calendar.DAY_OF_YEAR, 1) // Adiciona 90 dias à data de exclusão
         }.time
 
         val hoje = Calendar.getInstance().time
