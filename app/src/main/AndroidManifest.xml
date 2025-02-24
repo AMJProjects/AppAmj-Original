@@ -6,12 +6,9 @@
     <!-- Permissões necessárias -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -22,44 +19,45 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.APPAMJ"
-        tools:targetApi="31"
-        android:requestLegacyExternalStorage="true">
+        tools:targetApi="31">
 
-    <!-- Menu Principal Activity -->
-    <activity
-        android:name="com.amjsecurityfire.amjsecurityfire.MenuPrincipalActivity"
-        android:exported="true" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="@string/default_notification_channel_id" />
 
-    <!-- Tela de Recuperação de Senha -->
-    <activity
-        android:name="com.amjsecurityfire.amjsecurityfire.EsqueciSenhaActivity"
-        android:exported="false" />
+        <!-- Menu Principal Activity -->
+        <activity
+            android:name="com.amjsecurityfire.amjsecurityfire.MenuPrincipalActivity"
+            android:exported="true" />
 
-    <!-- Tela de Login (Principal) -->
-    <activity
-        android:name="com.amjsecurityfire.amjsecurityfire.MainActivity"
-        android:exported="true"
-        android:label="@string/app_name"
-        android:theme="@style/Theme.APPAMJ">
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
-    </activity>
+        <!-- Tela de Recuperação de Senha -->
+        <activity
+            android:name="com.amjsecurityfire.amjsecurityfire.EsqueciSenhaActivity"
+            android:exported="false" />
 
-    <activity android:name="com.amjsecurityfire.amjsecurityfire.RegistroActivity" />
-    <activity android:name=".AdicionarEscopoActivity" />
-    <activity android:name=".EscoposPendentesActivity" />
-    <activity android:name=".EscoposConcluidosActivity" />
-    <activity android:name=".PerfilActivity" />
-    <activity android:name=".EditarPerfilActivity" />
-    <activity android:name=".DetalhesEscopoActivity" />
-    <activity android:name=".EditarEscopoActivity" />
-    <activity android:name=".HistoricosEscoposActivity" />
+        <!-- Tela de Login (Principal) -->
+        <activity
+            android:name="com.amjsecurityfire.amjsecurityfire.MainActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.APPAMJ">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
-
-    <!-- Nova Tela de Escopos Excluídos -->
-    <activity android:name=".EscoposExcluidosActivity" />
+        <activity android:name="com.amjsecurityfire.amjsecurityfire.RegistroActivity" />
+        <activity android:name=".AdicionarEscopoActivity" />
+        <activity android:name=".EscoposPendentesActivity" />
+        <activity android:name=".EscoposConcluidosActivity" />
+        <activity android:name=".PerfilActivity" />
+        <activity android:name=".EditarPerfilActivity" />
+        <activity android:name=".DetalhesEscopoActivity" />
+        <activity android:name=".EditarEscopoActivity" />
+        <activity android:name=".HistoricosEscoposActivity" />
+        <!-- Nova Tela de Escopos Excluídos -->
+        <activity android:name=".EscoposExcluidosActivity" />
 
     </application>
 

@@ -40,7 +40,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.2"
+        kotlinCompilerExtensionVersion = "1.5.15" // Atualize para a versão mais recente
     }
 
     viewBinding {
@@ -49,18 +49,14 @@ android {
 }
 
 dependencies {
-
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("androidx.appcompat:appcompat:1.6.1") // Remover a versão duplicada
     implementation("androidx.core:core-ktx:1.10.1")
     implementation("com.squareup.okio:okio:2.10.0")
-    implementation(platform("com.google.firebase:firebase-bom:33.6.0"))
-    implementation("com.google.firebase:firebase-auth")
-    implementation("com.google.firebase:firebase-firestore")
-    implementation("com.google.android.gms:play-services-base:18.0.1")
-    implementation("com.google.firebase:firebase-auth:21.0.1")
-    implementation("com.google.firebase:firebase-firestore:24.0.0")
-    implementation("androidx.appcompat:appcompat:1.3.1")
+    implementation(platform("com.google.firebase:firebase-bom:33.9.0"))
+    implementation("com.google.firebase:firebase-auth:23.2.0")
+    implementation("com.google.firebase:firebase-firestore:25.1.2")
+    implementation("com.google.android.gms:play-services-base:18.5.0")
     implementation("com.google.firebase:firebase-appcheck-playintegrity:16.1.0")
 
     // Dependências do Compose
@@ -76,6 +72,7 @@ dependencies {
     implementation(libs.firebase.database.ktx)
     implementation(libs.firebase.storage.ktx)
     implementation(libs.androidx.viewfinder.core)
+    implementation("androidx.work:work-runtime-ktx:2.7.1")
 
     implementation("com.github.bumptech.glide:glide:4.12.0")
     annotationProcessor("com.github.bumptech.glide:compiler:4.12.0")

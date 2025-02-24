@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">APP AMJ</string>
+    <string name="default_notification_channel_id">seu_channel_id</string>
 </resources>

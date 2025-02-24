@@ -3,11 +3,16 @@ package com.amjsecurityfire.amjsecurityfire;
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.os.CountDownTimer
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.amjsecurityfire.amjsecurityfire.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -25,7 +30,7 @@ import java.util.concurrent.TimeUnit
 class EscoposExcluidosActivity : AppCompatActivity() {
     private lateinit var db: FirebaseFirestore
     private lateinit var containerExcluidos: LinearLayout
-    private lateinit var textDiasRestantes: TextView
+    private lateinit var textContagemRegressiva : TextView
     private lateinit var buttonVoltarMenu: Button
     private lateinit var progressBar: ProgressBar
     private lateinit var progressBarContainer: FrameLayout
@@ -35,9 +40,10 @@ class EscoposExcluidosActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.escopos_excluidos)
 
+        // Configuração dos elementos da UI
         db = FirebaseFirestore.getInstance()
         containerExcluidos = findViewById(R.id.layoutDinamico)
-        textDiasRestantes = findViewById(R.id.textDiasRestantes)
+        textContagemRegressiva = findViewById(R.id.textDiasRestantes)
         buttonVoltarMenu = findViewById(R.id.btnVoltarMenu)
         progressBarContainer = findViewById(R.id.progressBarContainer)
         progressBar = findViewById(R.id.progressBar)
@@ -45,33 +51,17 @@ class EscoposExcluidosActivity : AppCompatActivity() {
         progressBarContainer.visibility = View.VISIBLE
         buttonVoltarMenu.isEnabled = false
 
-        excluirEscoposAntigos {
-            carregarEscoposExcluidos()
-        }
+        carregarEscoposExcluidos()
+        iniciarContagemRegressiva()
+        agendarExclusaoEscopos()
 
-        buttonVoltarMenu.setOnClickListener {
-            finish()
-        }
+        buttonVoltarMenu.setOnClickListener { finish() }
+
+
     }
 
-    private fun excluirEscoposAntigos(onComplete: () -> Unit) {
-        val calendar = Calendar.getInstance()
-        calendar.add(Calendar.DAY_OF_YEAR, -90)
-        val dataLimite = Timestamp(calendar.time)
 
-        db.collection("escoposExcluidos")
-            .whereLessThan("dataExclusao", dataLimite)
-            .get()
-            .addOnSuccessListener { documents ->
-                val batch = db.batch()
-                documents.forEach { batch.delete(it.reference) }
-                batch.commit().addOnCompleteListener { onComplete() }
-            }
-            .addOnFailureListener {
-                Log.e("Firestore", "Erro ao excluir escopos antigos", it)
-                onComplete()
-            }
-    }
+
 
     private fun carregarEscoposExcluidos() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
@@ -82,9 +72,8 @@ class EscoposExcluidosActivity : AppCompatActivity() {
                 val nomeUsuario = snapshot.child("nome").getValue(String::class.java) ?: "Usuário desconhecido"
 
                 db.collection("escoposExcluidos")
-                    .orderBy("numeroEscopo", Query.Direction.ASCENDING)
                     .limit(10)
-                    .get() // Mudança de addSnapshotListener para get()
+                    .get()
                     .addOnSuccessListener { snapshots ->
                         processarEscopos(snapshots, nomeUsuario)
                     }
@@ -136,12 +125,6 @@ class EscoposExcluidosActivity : AppCompatActivity() {
             }
         }
 
-        textDiasRestantes.text = if (diasMinimos != Int.MAX_VALUE) {
-            "Os escopos excluídos serão removidos permanentemente em $diasMinimos dias."
-        } else {
-            "Não há escopos para excluir."
-        }
-
         progressBarContainer.visibility = View.GONE
         buttonVoltarMenu.isEnabled = true
     }
@@ -156,6 +139,28 @@ class EscoposExcluidosActivity : AppCompatActivity() {
         val hoje = Calendar.getInstance().time
         val diferencaMillis = dataExpiracao.time - hoje.time
         return (diferencaMillis / (1000 * 60 * 60 * 24)).toInt().coerceAtLeast(0)
+    }
+
+    private fun iniciarContagemRegressiva() {
+        object : CountDownTimer(300000, 1000) { // 5 minutos, atualiza a cada segundo
+            override fun onTick(millisUntilFinished: Long) {
+                val minutos = millisUntilFinished / 60000
+                val segundos = (millisUntilFinished % 60000) / 1000
+                textContagemRegressiva.text = "Exclusão em: $minutos min $segundos seg"
+            }
+
+            override fun onFinish() {
+                textContagemRegressiva.text = "Escopos excluídos permanentemente!"
+            }
+        }.start()
+    }
+
+    private fun agendarExclusaoEscopos() {
+        val workRequest = OneTimeWorkRequestBuilder<ExcluirEscoposWorker>()
+            .setInitialDelay(5, TimeUnit.MINUTES) // Executa após 5 minutos
+            .build()
+
+        WorkManager.getInstance(this).enqueue(workRequest)
     }
 
     private fun adicionarTextoDinamico(escopo: Map<String, String>) {
@@ -208,6 +213,9 @@ class EscoposExcluidosActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         }
+
+
+
 
         layoutEscopo.addView(textView)
         layoutEscopo.addView(buttonVisualizar)
