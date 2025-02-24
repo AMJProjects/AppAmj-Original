@@ -311,6 +311,8 @@ public class AdicionarEscopoActivity : AppCompatActivity(){
         findViewById<Spinner>(R.id.spinnerTipoManutencao2).isEnabled = !isLoading
     }
 
+    // Dentro da classe AdicionarEscopoActivity
+
     private fun salvarNoFirestore(status: String, novoEscopo: Map<String, Any>, editMode: Boolean, escopoId: String?) {
         val escoposCollection = if (status == "Concluído") {
             db.collection("escoposConcluidos")
@@ -318,58 +320,63 @@ public class AdicionarEscopoActivity : AppCompatActivity(){
             db.collection("escoposPendentes")
         }
 
-        // Obter o usuário autenticado
-        val currentUser = FirebaseAuth.getInstance().currentUser
-        val usuarioNome = currentUser?.displayName ?: "Usuário Desconhecido" // Caso o usuário não tenha nome configurado
-
-        // Definir o fuso horário para horário de Brasília
+        // Formatar data atual para o padrão dd/MM/yy
         val timeZone = TimeZone.getTimeZone("America/Sao_Paulo")
         val calendar = Calendar.getInstance(timeZone)
-        val dataCriacao = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(calendar.time)
+        val sdf = SimpleDateFormat("dd/MM/yy", Locale("pt", "BR"))
+        val dataAcao = sdf.format(calendar.time)
 
-        // Se editMode é verdadeiro, edita o escopo existente, caso contrário cria um novo escopo
+        // Obter número do escopo e ação
+        val numeroEscopo = novoEscopo["numeroEscopo"] as Int
+        val acao = if (editMode) "edição" else "criação"
+
+        // Salvar/Atualizar escopo principal
         if (editMode && escopoId != null) {
             escoposCollection.document(escopoId)
-                    .update(novoEscopo)
-                    .addOnSuccessListener {
-                Toast.makeText(this, "Escopo atualizado com sucesso!", Toast.LENGTH_SHORT).show()
-                registrarHistoricoEscopo(escopoId, usuarioNome, "Editado", dataCriacao) // Registrar histórico de edição
-                finish()
-            }
-                .addOnFailureListener { e ->
-                    Toast.makeText(this, "Erro ao atualizar o escopo: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
-        } else {
-            escoposCollection.add(novoEscopo)
-                .addOnSuccessListener { documentReference ->
-                    Toast.makeText(this, "Escopo salvo com sucesso!", Toast.LENGTH_SHORT).show()
-                    registrarHistoricoEscopo(documentReference.id, usuarioNome, "Criado", dataCriacao) // Registrar histórico de criação
+                .update(novoEscopo)
+                .addOnSuccessListener {
+                    registrarHistoricoEscopo(numeroEscopo, usuarioNome, acao, dataAcao)
+                    Toast.makeText(this, "Escopo atualizado!", Toast.LENGTH_SHORT).show()
                     finish()
                 }
                 .addOnFailureListener { e ->
-                    Toast.makeText(this, "Erro ao salvar o escopo: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
+                    Toast.makeText(this, "Erro ao atualizar: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+        } else {
+            escoposCollection.add(novoEscopo)
+                .addOnSuccessListener {
+                    registrarHistoricoEscopo(numeroEscopo, usuarioNome, acao, dataAcao)
+                    Toast.makeText(this, "Escopo criado!", Toast.LENGTH_SHORT).show()
+                    finish()
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(this, "Erro ao criar: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
         }
     }
 
-
-    // Função para registrar histórico de escopo
-    private fun registrarHistoricoEscopo(escopoId: String, usuario: String, acao: String, data: String) {
-        val historico = mapOf(
-                "escopoId" to escopoId,
-                "usuario" to usuario,
-                "acao" to acao,
-                "data" to data
+    // Função para registrar histórico atualizada
+    private fun registrarHistoricoEscopo(
+        numeroEscopo: Int,
+        usuario: String,
+        acao: String,
+        data: String
+    ) {
+        val historico = hashMapOf(
+            "número do escopo" to numeroEscopo,
+            "ação" to acao,
+            "usuário" to usuario,
+            "data" to data
         )
 
         db.collection("historicoEscopos")
-                .add(historico)
-                .addOnSuccessListener {
-            Log.d("Historico", "Histórico registrado com sucesso.")
-        }
+            .add(historico)
+            .addOnSuccessListener {
+                Log.d("HISTORICO", "Registro histórico salvo")
+            }
             .addOnFailureListener { e ->
-                Log.w("Historico", "Erro ao registrar o histórico: ${e.message}")
-        }
+                Log.e("HISTORICO", "Erro ao salvar histórico", e)
+            }
     }
 
 
@@ -391,6 +398,7 @@ public class AdicionarEscopoActivity : AppCompatActivity(){
             onSuccess(null)
         }
     }
+
 
     private fun setupSpinner(spinner: Spinner, items: List<String>, selectedItem: String) {
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, items)
