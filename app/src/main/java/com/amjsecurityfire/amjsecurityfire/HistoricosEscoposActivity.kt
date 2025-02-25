@@ -40,10 +40,9 @@ class HistoricosEscoposActivity : AppCompatActivity() {
             .addOnSuccessListener { querySnapshot ->
                 historicoList.clear()
                 for (document in querySnapshot) {
-                    // Acessa os campos corretamente
-                    val numeroEscopo = document.getLong("numeroEscopo")?.toString() ?: "Desconhecido"
-                    val acao = document.getString("acao") ?: "Ação desconhecida"
-                    val usuario = document.getString("usuario") ?: "Usuário desconhecido"
+                    val numeroEscopo = document.getLong("numero do escopo")?.toString() ?: "Desconhecido"
+                    val acao = document.getString("ação") ?: "Ação desconhecida"
+                    val usuario = document.getString("usuário") ?: "Usuário desconhecido"
                     val data = document.getString("data") ?: "Data desconhecida"
 
                     // Formata a informação para exibição
@@ -62,4 +61,5 @@ class HistoricosEscoposActivity : AppCompatActivity() {
                 Toast.makeText(this, "Erro ao carregar histórico: ${exception.message}", Toast.LENGTH_SHORT).show()
             }
     }
+
 }
