@@ -20,11 +20,6 @@ class MenuPrincipalActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.menu_principal)
 
-        val btnExcluir = findViewById<Button>(R.id.btnExcluirEscopos)
-
-        btnExcluir.setOnClickListener {
-            excluirTodosOsEscopos()
-        }
 
         // Botões principais
         val escoposPendentesButton = findViewById<Button>(R.id.btn_pendente)
