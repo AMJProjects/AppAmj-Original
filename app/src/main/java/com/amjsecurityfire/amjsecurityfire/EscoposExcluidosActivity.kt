@@ -67,17 +67,6 @@ class EscoposExcluidosActivity : AppCompatActivity() {
 
                         snapshots?.let {
                             for (document in it) {
-                                val dataExclusaoValue = document.get("dataExclusao") // Obtém o valor de forma genérica
-
-                                // Verifica se o valor é do tipo Timestamp
-                                val diasRestantes = when (dataExclusaoValue) {
-                                    is com.google.firebase.Timestamp -> calcularDiasRestantes(dataExclusaoValue)
-                                    is String -> { // Se for String, você pode tentar convertê-lo se necessário
-                                        // Por exemplo, se a string está em um formato específico
-                                        0 // Retornar 0 ou tratar como desejar
-                                    }
-                                    else -> 0 // Se for outro tipo, assume 0
-                                }
 
                                 // Atualiza a lista de escopos
                                 val escopo = mapOf(
@@ -90,15 +79,10 @@ class EscoposExcluidosActivity : AppCompatActivity() {
                                     "numeroPedidoCompra" to document.getString("numeroPedidoCompra").orEmpty(),
                                     "motivoExclusao" to document.getString("motivoExclusao").orEmpty(),
                                     "excluidoPor" to (document.getString("excluidoPor") ?: nomeUsuario),
-                                    "escopoId" to document.id,
-                                    "diasRestantes" to diasRestantes.toString() // Adiciona dias restantes à lista
+                                    "escopoId" to document.id
                                 )
                                 escoposList.add(escopo)
 
-                                // Atualiza o menor valor de dias restantes
-                                if (diasRestantes < diasMinimos) {
-                                    diasMinimos = diasRestantes
-                                }
                             }
                         }
 
