@@ -21,11 +21,10 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.amjsecurityfire.amjsecurityfire.MenuPrincipalActivity
 import com.google.firebase.auth.FirebaseAuth
 
 
-public class MainActivity : AppCompatActivity(){
+class MainActivity : AppCompatActivity(){
     private var isPasswordVisible: Boolean = false
     private lateinit var auth: FirebaseAuth
     private val REQUEST_CODE_STORAGE_PERMISSION = 101

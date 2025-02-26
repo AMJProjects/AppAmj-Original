@@ -10,11 +10,10 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.amjsecurityfire.amjsecurityfire.R
 import android.Manifest
 import android.content.pm.PackageManager
 
-public class DetalhesEscopoActivity : AppCompatActivity(){
+class DetalhesEscopoActivity : AppCompatActivity(){
     private val PERMISSION_REQUEST_CODE = 1
     private val PICK_PDF_REQUEST_CODE = 2
 

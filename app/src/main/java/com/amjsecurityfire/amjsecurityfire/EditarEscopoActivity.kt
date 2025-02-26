@@ -5,12 +5,9 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import com.amjsecurityfire.amjsecurityfire.R
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.auth.FirebaseAuth
-import java.text.SimpleDateFormat
-import java.util.*
 
 class EditarEscopoActivity : AppCompatActivity() {
     private lateinit var db: FirebaseFirestore

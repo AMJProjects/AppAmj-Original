@@ -6,7 +6,7 @@ import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
 
-public class CircleView @JvmOverloads constructor(
+class CircleView @JvmOverloads constructor(
     context: Context,
     private val borderColor: Int,
     attrs: AttributeSet? = null

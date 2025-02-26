@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.amjsecurityfire.amjsecurityfire.MainActivity
 import com.amjsecurityfire.amjsecurityfire.databinding.RegistroBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
@@ -13,7 +12,7 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.database.FirebaseDatabase
 
 
-public class RegistroActivity : AppCompatActivity(){
+class RegistroActivity : AppCompatActivity(){
     private lateinit var auth: FirebaseAuth
     private lateinit var binding: RegistroBinding
     private val database = FirebaseDatabase.getInstance().reference

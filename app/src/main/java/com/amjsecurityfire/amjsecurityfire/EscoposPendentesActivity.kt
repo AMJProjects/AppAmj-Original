@@ -2,12 +2,10 @@ package com.amjsecurityfire.amjsecurityfire;
 
 import android.content.Intent
 import android.graphics.Color
-import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import com.amjsecurityfire.amjsecurityfire.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -19,7 +17,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
-public class EscoposPendentesActivity : AppCompatActivity(){
+class EscoposPendentesActivity : AppCompatActivity(){
     private lateinit var db: FirebaseFirestore
     private lateinit var containerPendentes: LinearLayout
     private lateinit var buttonVoltarMenu: Button

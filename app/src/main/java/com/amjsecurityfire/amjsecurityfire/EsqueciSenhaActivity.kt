@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 
 
-public class EsqueciSenhaActivity : AppCompatActivity(){
+class EsqueciSenhaActivity : AppCompatActivity(){
     private lateinit var emailEditText: EditText
     private lateinit var sendRecoveryButton: Button
     private lateinit var auth: FirebaseAuth

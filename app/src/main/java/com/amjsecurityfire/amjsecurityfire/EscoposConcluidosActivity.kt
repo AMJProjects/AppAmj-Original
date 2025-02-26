@@ -1,19 +1,11 @@
 package com.amjsecurityfire.amjsecurityfire;
 
-import android.content.Context
 import android.content.Intent
 import android.graphics.Color
-import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
-import android.util.Log
-import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import com.amjsecurityfire.amjsecurityfire.R
-import com.google.android.gms.tasks.Task
-import com.google.android.gms.tasks.TaskCompletionSource
-import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -25,7 +17,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
-public class EscoposConcluidosActivity : AppCompatActivity(){
+class EscoposConcluidosActivity : AppCompatActivity(){
     private lateinit var db: FirebaseFirestore
     private lateinit var containerConcluidos: LinearLayout
     private lateinit var buttonVoltarMenu: Button

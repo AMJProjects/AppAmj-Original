@@ -9,12 +9,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import kotlin.random.Random
 import androidx.appcompat.app.AppCompatActivity
-import com.amjsecurityfire.amjsecurityfire.MainActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
-import com.amjsecurityfire.amjsecurityfire.R
 
-public class PerfilActivity : AppCompatActivity(){
+class PerfilActivity : AppCompatActivity(){
     private val REQUEST_CODE_EDITAR_PERFIL = 1
     private lateinit var auth: FirebaseAuth
     private lateinit var database: DatabaseReference
