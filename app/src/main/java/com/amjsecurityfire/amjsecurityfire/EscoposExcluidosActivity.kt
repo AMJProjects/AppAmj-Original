@@ -53,7 +53,7 @@ class EscoposExcluidosActivity : AppCompatActivity() {
 
         carregarEscoposExcluidos()
         iniciarContagemRegressiva()
-        //agendarExclusaoEscopos()
+        agendarExclusaoEscopos()
 
         buttonVoltarMenu.setOnClickListener { finish() }
 
@@ -153,13 +153,13 @@ class EscoposExcluidosActivity : AppCompatActivity() {
         }.start()
     }
 
-    //private fun agendarExclusaoEscopos() {
-     //   val workRequest = OneTimeWorkRequestBuilder<ExcluirEscoposWorker>()
-     //       .setInitialDelay(5, TimeUnit.MINUTES) // Executa após 5 minutos
-     //       .build()
-//
-    //    WorkManager.getInstance(this).enqueue(workRequest)
-   // }
+    private fun agendarExclusaoEscopos() {
+        val workRequest = OneTimeWorkRequestBuilder<ExcluirEscoposWorker>()
+           .setInitialDelay(5, TimeUnit.MINUTES) // Executa após 5 minutos
+            .build()
+
+        WorkManager.getInstance(this).enqueue(workRequest)
+    }
 
     private fun adicionarTextoDinamico(escopo: Map<String, String>) {
         val layoutEscopo = LinearLayout(this).apply {
