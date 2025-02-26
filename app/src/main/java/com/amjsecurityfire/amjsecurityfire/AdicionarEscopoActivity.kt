@@ -380,6 +380,7 @@ public class AdicionarEscopoActivity : AppCompatActivity(){
     }
 
 
+
     private fun uploadPdfToStorage(onSuccess: (String?) -> Unit, onFailure: (Exception) -> Unit) {
         if (pdfUri != null) {
             val storageRef = FirebaseStorage.getInstance().reference

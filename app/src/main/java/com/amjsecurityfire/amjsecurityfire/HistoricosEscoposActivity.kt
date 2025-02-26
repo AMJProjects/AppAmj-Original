@@ -1,4 +1,4 @@
-package com.amjsecurityfire.amjsecurityfire;
+package com.amjsecurityfire.amjsecurityfire
 
 import android.os.Bundle
 import android.widget.ArrayAdapter
@@ -6,7 +6,6 @@ import android.widget.Button
 import android.widget.ListView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.amjsecurityfire.amjsecurityfire.R
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 
@@ -40,13 +39,14 @@ class HistoricosEscoposActivity : AppCompatActivity() {
             .addOnSuccessListener { querySnapshot ->
                 historicoList.clear()
                 for (document in querySnapshot) {
-                    val numeroEscopo = document.getLong("numero do escopo")?.toString() ?: "Desconhecido"
+                    val numeroEscopo = document.getLong("número do escopo")?.toString() ?: "Desconhecido"
                     val acao = document.getString("ação") ?: "Ação desconhecida"
                     val usuario = document.getString("usuário") ?: "Usuário desconhecido"
                     val data = document.getString("data") ?: "Data desconhecida"
 
                     // Formata a informação para exibição
-                    val historicoInfo = "Escopo #$numeroEscopo - $acao\n" +
+                    val historicoInfo = "Escopo: #$numeroEscopo\n" +
+                            "Ação: $acao\n" +
                             "Realizado por: $usuario\n" +
                             "Data: $data"
                     historicoList.add(historicoInfo)
