@@ -1,9 +1,10 @@
-package com.amjsecurityfire.amjsecurityfire;
+package com.amjsecurityfire.amjsecurityfire
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import kotlinx.coroutines.*
 import android.os.Bundle
-import android.util.Log
+import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
@@ -13,86 +14,100 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
-import com.google.firebase.Timestamp
-import java.util.Calendar
-
+import kotlinx.coroutines.tasks.await
 
 class EscoposExcluidosActivity : AppCompatActivity() {
     private lateinit var db: FirebaseFirestore
     private lateinit var containerExcluidos: LinearLayout
     private lateinit var buttonVoltarMenu: Button
-    private val escoposList = mutableListOf<Map<String, String>>() // Lista para armazenar os escopos
+    private lateinit var progressBarContainer: FrameLayout
+    private val escoposList = mutableListOf<Map<String, String>>()
+    private var nomeUsuario: String = "Desconhecido"
+
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.escopos_excluidos)
 
-
         db = FirebaseFirestore.getInstance()
         containerExcluidos = findViewById(R.id.layoutDinamico)
         buttonVoltarMenu = findViewById(R.id.btnVoltarMenu)
-
+        progressBarContainer = findViewById(R.id.progressBarContainer)
 
         buttonVoltarMenu.setOnClickListener {
-            finish() // Voltar ao menu anterior
+            finish()
+        }
+        carregarNomeUsuario()
+        carregarEscoposExcluidos()
+    }
+
+    private fun carregarNomeUsuario() {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        if (userId != null) {
+            val userRef = FirebaseDatabase.getInstance().getReference("users").child(userId)
+            userRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    nomeUsuario = snapshot.child("nome").getValue(String::class.java) ?: "Desconhecido"
+                    carregarEscoposExcluidos()
+                }
+                override fun onCancelled(error: DatabaseError) {
+                    Toast.makeText(this@EscoposExcluidosActivity, "Erro ao carregar nome do usuário", Toast.LENGTH_SHORT).show()
+                    carregarEscoposExcluidos()
+                }
+            })
+        } else {
+            carregarEscoposExcluidos()
         }
     }
 
-
-
-
-
-
     private fun carregarEscoposExcluidos() {
-        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        progressBarContainer.visibility = View.VISIBLE // Mostra a ProgressBar
 
-        val userRef = FirebaseDatabase.getInstance().reference.child("users").child(userId)
-        userRef.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val nomeUsuario = snapshot.child("nome").getValue(String::class.java) ?: "Usuário desconhecido"
-
-                db.collection("escoposExcluidos")
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val snapshots = db.collection("escoposExcluidos")
                     .orderBy("numeroEscopo", Query.Direction.ASCENDING)
-                    .addSnapshotListener { snapshots, error ->
-                        if (error != null) {
-                            Toast.makeText(this@EscoposExcluidosActivity, "Erro ao carregar escopos.", Toast.LENGTH_SHORT).show()
-                            return@addSnapshotListener
+                    .get()
+                    .await()
+
+                withContext(Dispatchers.Main) {
+                    escoposList.clear()
+                    containerExcluidos.removeAllViews()
+
+                    for (document in snapshots) {
+                        val numeroEscopo = when (val numero = document.get("numeroEscopo")) {
+                            is String -> numero
+                            is Long -> numero.toString()
+                            else -> ""
                         }
 
-                        escoposList.clear()
-                        containerExcluidos.removeAllViews()
+                        val escopo = mapOf(
+                            "numeroEscopo" to numeroEscopo,
+                            "tipoServico" to document.getString("tipoServico").orEmpty(),
+                            "empresa" to document.getString("empresa").orEmpty(),
+                            "dataEstimativa" to document.getString("dataEstimativa").orEmpty(),
+                            "status" to document.getString("status").orEmpty(),
+                            "resumoEscopo" to document.getString("resumoEscopo").orEmpty(),
+                            "numeroPedidoCompra" to document.getString("numeroPedidoCompra").orEmpty(),
+                            "motivoExclusao" to document.getString("motivoExclusao").orEmpty(),
+                            "excluidoPor" to (document.getString("excluidoPor") ?: nomeUsuario),
+                            "escopoId" to document.id
+                        )
 
-                        var diasMinimos = Int.MAX_VALUE // Para encontrar o menor valor
-
-                        snapshots?.let {
-                            for (document in it) {
-
-                                // Atualiza a lista de escopos
-                                val escopo = mapOf(
-                                    "numeroEscopo" to (document.getLong("numeroEscopo")?.toString() ?: ""),
-                                    "empresa" to document.getString("empresa").orEmpty(),
-                                    "dataEstimativa" to document.getString("dataEstimativa").orEmpty(),
-                                    "tipoServico" to document.getString("tipoServico").orEmpty(),
-                                    "status" to document.getString("status").orEmpty(),
-                                    "resumoEscopo" to document.getString("resumoEscopo").orEmpty(),
-                                    "numeroPedidoCompra" to document.getString("numeroPedidoCompra").orEmpty(),
-                                    "motivoExclusao" to document.getString("motivoExclusao").orEmpty(),
-                                    "excluidoPor" to (document.getString("excluidoPor") ?: nomeUsuario),
-                                    "escopoId" to document.id
-                                )
-                                escoposList.add(escopo)
-
-                            }
-                        }
-
+                        escoposList.add(escopo)
+                        adicionarTextoDinamico(escopo)
                     }
-            }
 
-            override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(this@EscoposExcluidosActivity, "Erro ao carregar dados do usuário.", Toast.LENGTH_SHORT).show()
+                    progressBarContainer.visibility = View.GONE // Esconde a ProgressBar
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    progressBarContainer.visibility = View.GONE // Esconde a ProgressBar em caso de erro
+                    Toast.makeText(this@EscoposExcluidosActivity, "Erro ao carregar escopos.", Toast.LENGTH_SHORT).show()
+                }
             }
-        })
+        }
     }
 
     private fun adicionarTextoDinamico(escopo: Map<String, String>) {
@@ -125,17 +140,18 @@ class EscoposExcluidosActivity : AppCompatActivity() {
         val buttonVisualizar = Button(this).apply {
             text = "Visualizar Detalhes"
             setOnClickListener {
-                val intent = Intent(this@EscoposExcluidosActivity, DetalhesEscopoActivity::class.java)
-                intent.putExtra("numeroEscopo", escopo["numeroEscopo"])
-                intent.putExtra("empresa", escopo["empresa"])
-                intent.putExtra("dataEstimativa", escopo["dataEstimativa"])
-                intent.putExtra("tipoServico", escopo["tipoServico"])
-                intent.putExtra("status", escopo["status"])
-                intent.putExtra("resumoEscopo", escopo["resumoEscopo"])
-                intent.putExtra("numeroPedidoCompra", escopo["numeroPedidoCompra"])
-                intent.putExtra("motivoExclusao", escopo["motivoExclusao"])
-                intent.putExtra("excluidoPor", escopo["excluidoPor"])
-                intent.putExtra("escopoId", escopo["escopoId"])
+                val intent = Intent(this@EscoposExcluidosActivity, DetalhesEscopoActivity::class.java).apply {
+                    putExtra("numeroEscopo", escopo["numeroEscopo"])
+                    putExtra("empresa", escopo["empresa"])
+                    putExtra("dataEstimativa", escopo["dataEstimativa"])
+                    putExtra("tipoServico", escopo["tipoServico"])
+                    putExtra("status", escopo["status"])
+                    putExtra("resumoEscopo", escopo["resumoEscopo"])
+                    putExtra("numeroPedidoCompra", escopo["numeroPedidoCompra"])
+                    putExtra("motivoExclusao", escopo["motivoExclusao"])
+                    putExtra("excluidoPor", escopo["excluidoPor"])
+                    putExtra("escopoId", escopo["escopoId"])
+                }
                 startActivity(intent)
             }
         }
