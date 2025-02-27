@@ -5,18 +5,46 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.*
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
-import com.google.firebase.auth.FirebaseAuth
 
 class EditarEscopoActivity : AppCompatActivity() {
     private lateinit var db: FirebaseFirestore
+
+    // 1) Variável para guardar o nome do usuário obtido do Realtime Database
+    private lateinit var usuarioNome: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.editar_escopo)
 
         db = FirebaseFirestore.getInstance()
+
+        // -- Início da lógica para buscar o nome do usuário do Realtime Database --
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        if (currentUser != null) {
+            val userId = currentUser.uid
+            val databaseReference = FirebaseDatabase.getInstance().getReference("users/$userId")
+
+            // Aqui buscamos o campo "nome" dentro de "users/<uid>/nome"
+            databaseReference.child("nome").addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    // Se existir, usamos o valor. Senão, "Usuário Desconhecido"
+                    usuarioNome = snapshot.getValue(String::class.java) ?: "Usuário Desconhecido"
+                    Log.d("EditarEscopo", "Nome do usuário carregado do Realtime Database: $usuarioNome")
+                }
+                override fun onCancelled(error: DatabaseError) {
+                    usuarioNome = "Usuário Desconhecido"
+                    Log.e("EditarEscopo", "Erro ao buscar nome do usuário: ${error.message}")
+                }
+            })
+        } else {
+            // Se não estiver logado, usar "Usuário Desconhecido"
+            usuarioNome = "Usuário Desconhecido"
+        }
+        // -- Fim da lógica para buscar o nome do usuário do Realtime Database --
 
         // Recebe o ID do escopo pela Intent
         val escopoId = intent.getStringExtra("escopoId")
@@ -39,15 +67,13 @@ class EditarEscopoActivity : AppCompatActivity() {
 
         // Dados para o Spinner
         val tiposServicos = listOf("Preventiva", "Corretiva", "Obra")
-
-        // Configurar o Spinner
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, tiposServicos)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         tipoServicoSpinner.adapter = adapter
 
-        // Função para carregar os dados mais recentes do Firestore
+        // Função para carregar os dados do Firestore
         fun carregarDadosDoFirestore() {
-            // Carregar dados de escoposPendentes
+            // Tenta primeiro em escoposPendentes
             db.collection("escoposPendentes").document(escopoId).get()
                 .addOnSuccessListener { document ->
                     if (document.exists()) {
@@ -57,42 +83,38 @@ class EditarEscopoActivity : AppCompatActivity() {
                         val tipoServico = document.getString("tipoServico") ?: ""
                         val numeroPedidoCompra = document.getString("numeroPedidoCompra") ?: ""
 
-                        // Preencher os campos com os dados do Firestore
                         empresaEditText.setText(empresa)
                         dataEstimativaEditText.setText(dataEstimativa)
                         resumoEditText.setText(resumoEscopo)
                         numeroPedidoCompraEditText.setText(numeroPedidoCompra)
 
-                        // Configurar o Spinner para selecionar o valor correto
                         val tipoServicoIndex = tiposServicos.indexOf(tipoServico)
                         if (tipoServicoIndex != -1) {
                             tipoServicoSpinner.setSelection(tipoServicoIndex)
                         }
                     } else {
-                        // Tentar carregar dados de escoposConcluidos se não encontrado em escoposPendentes
+                        // Se não achar, tenta em escoposConcluidos
                         db.collection("escoposConcluidos").document(escopoId).get()
-                            .addOnSuccessListener { documentConcluido ->
-                                if (documentConcluido.exists()) {
-                                    val empresa = documentConcluido.getString("empresa") ?: ""
-                                    val dataEstimativa = documentConcluido.getString("dataEstimativa") ?: ""
-                                    val resumoEscopo = documentConcluido.getString("resumoEscopo") ?: ""
-                                    val tipoServico = documentConcluido.getString("tipoServico") ?: ""
-                                    val numeroPedidoCompra = documentConcluido.getString("numeroPedidoCompra") ?: ""
+                            .addOnSuccessListener { docConcluido ->
+                                if (docConcluido.exists()) {
+                                    val empresa = docConcluido.getString("empresa") ?: ""
+                                    val dataEstimativa = docConcluido.getString("dataEstimativa") ?: ""
+                                    val resumoEscopo = docConcluido.getString("resumoEscopo") ?: ""
+                                    val tipoServico = docConcluido.getString("tipoServico") ?: ""
+                                    val numeroPedidoCompra = docConcluido.getString("numeroPedidoCompra") ?: ""
 
-                                    // Preencher os campos com os dados de escoposConcluidos
                                     empresaEditText.setText(empresa)
                                     dataEstimativaEditText.setText(dataEstimativa)
                                     resumoEditText.setText(resumoEscopo)
                                     numeroPedidoCompraEditText.setText(numeroPedidoCompra)
 
-                                    // Configurar o Spinner para selecionar o valor correto
                                     val tipoServicoIndex = tiposServicos.indexOf(tipoServico)
                                     if (tipoServicoIndex != -1) {
                                         tipoServicoSpinner.setSelection(tipoServicoIndex)
                                     }
                                 } else {
                                     Toast.makeText(this, "Erro: Documento não encontrado nas duas coleções!", Toast.LENGTH_SHORT).show()
-                                    finish() // Aqui, se o documento não existir, fechamos a activity
+                                    finish()
                                 }
                             }
                             .addOnFailureListener { e ->
@@ -105,9 +127,10 @@ class EditarEscopoActivity : AppCompatActivity() {
                 }
         }
 
-        // Carrega os dados ao abrir a tela
+        // Carrega os dados
         carregarDadosDoFirestore()
 
+        // Botão salvar
         salvarButton.setOnClickListener {
             val dadosAtualizados = hashMapOf(
                 "empresa" to empresaEditText.text.toString(),
@@ -117,47 +140,39 @@ class EditarEscopoActivity : AppCompatActivity() {
                 "numeroPedidoCompra" to numeroPedidoCompraEditText.text.toString()
             )
 
-            // Atualizar escopo nas coleções escoposPendentes e escoposConcluidos
+            // Atualiza nas coleções
             db.collection("escoposPendentes").document(escopoId)
                 .set(dadosAtualizados, SetOptions.merge())
                 .addOnSuccessListener {
-                    Log.d("EditarEscopo", "Escopo em Pendentes atualizado com sucesso: $dadosAtualizados")
-
                     db.collection("escoposConcluidos").document(escopoId)
                         .set(dadosAtualizados, SetOptions.merge())
                         .addOnSuccessListener {
-                            Log.d("EditarEscopo", "Escopo em Concluídos atualizado com sucesso: $dadosAtualizados")
                             Toast.makeText(this, "Escopo atualizado com sucesso!", Toast.LENGTH_SHORT).show()
 
-                            // Obter o nome do usuário logado
-                            val usuario = FirebaseAuth.getInstance().currentUser?.displayName ?: FirebaseAuth.getInstance().currentUser?.email ?: "Usuário desconhecido"
-
-                            // Adicionar log para verificar o valor do nome de usuário
-                            Log.d("EditarEscopo", "Usuário logado: $usuario")
-
-                            // Obter a data sem a hora (apenas a data)
+                            // Registrar histórico
                             val dataAtual = System.currentTimeMillis()
                             val dataFormatada = android.text.format.DateFormat.format("dd/MM/yyyy", dataAtual).toString()
+                            val dataFormatadaAjustada = dataFormatada.replace("2025", "25")
+
                             val numeroEscopo = intent.getStringExtra("numeroEscopo")?.toLongOrNull() ?: 0L
 
-                            // Gravar o histórico de edição
+                            // 2) Ao salvar no histórico, use a variável 'usuarioNome'
                             val historicoDados = hashMapOf(
                                 "ação" to "Edição",
-                                "data" to dataFormatada,  // A data agora sem a hora
-                                "número do Escopo" to numeroEscopo,  // Número do escopo como número
-                                "usuário" to usuario  // Nome do usuário logado
+                                "data" to dataFormatadaAjustada,
+                                "número do escopo" to numeroEscopo,
+                                "usuário" to usuarioNome // Aqui usamos o valor vindo do Realtime DB
                             )
 
-                            // Gravar no histórico
                             db.collection("historicoEscopos").add(historicoDados)
                                 .addOnSuccessListener {
-                                    Log.d("HistoricoEscopo", "Histórico de edição registrado com sucesso!")
+                                    Log.d("EditarEscopo", "Histórico de edição registrado com sucesso! (usuário=$usuarioNome)")
                                 }
                                 .addOnFailureListener { e ->
-                                    Log.e("HistoricoEscopo", "Erro ao registrar histórico de edição", e)
+                                    Log.e("EditarEscopo", "Erro ao registrar histórico de edição: ${e.message}")
                                 }
 
-                            // Enviar os dados atualizados para a DetalhesEscopoActivity
+                            // Retornar para a tela anterior com os dados atualizados
                             val resultIntent = Intent()
                             resultIntent.putExtra("escopoId", escopoId)
                             resultIntent.putExtra("numeroEscopo", intent.getStringExtra("numeroEscopo"))
@@ -169,21 +184,19 @@ class EditarEscopoActivity : AppCompatActivity() {
                             resultIntent.putExtra("numeroPedidoCompra", numeroPedidoCompraEditText.text.toString())
 
                             setResult(RESULT_OK, resultIntent)
-                            finish() // Volta para a tela anterior (DetalhesEscopoActivity)
+                            finish()
                         }
                         .addOnFailureListener { e ->
-                            Log.e("EditarEscopo", "Erro ao atualizar escopo em Concluídos", e)
                             Toast.makeText(this, "Erro ao atualizar escopo em Concluídos: ${e.message}", Toast.LENGTH_SHORT).show()
                         }
                 }
                 .addOnFailureListener { e ->
-                    Log.e("EditarEscopo", "Erro ao atualizar escopo em Pendentes", e)
                     Toast.makeText(this, "Erro ao atualizar escopo em Pendentes: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
         }
 
         cancelarButton.setOnClickListener {
-            finish() // Volta à tela anterior (DetalhesEscopoActivity)
+            finish()
         }
     }
 }
