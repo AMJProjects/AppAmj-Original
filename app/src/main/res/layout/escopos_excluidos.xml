@@ -21,8 +21,8 @@
 
     <ScrollView
         android:id="@+id/scrollView"
-        android:layout_width="380dp"
-        android:layout_height="720dp"
+        android:layout_width="370dp"
+        android:layout_height="708dp"
         app:layout_constraintBottom_toTopOf="@+id/btnVoltarMenu"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
