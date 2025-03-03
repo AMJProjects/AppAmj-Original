@@ -62,8 +62,8 @@ class EscoposExcluidosActivity : AppCompatActivity() {
     }
 
     private fun carregarEscoposExcluidos() {
-        progressBarContainer.visibility = View.VISIBLE // Mostra a ProgressBar
-
+        progressBarContainer.visibility = View.VISIBLE
+        buttonVoltarMenu.isEnabled = false
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val snapshots = db.collection("escoposExcluidos")
@@ -100,10 +100,12 @@ class EscoposExcluidosActivity : AppCompatActivity() {
                     }
 
                     progressBarContainer.visibility = View.GONE // Esconde a ProgressBar
+                    buttonVoltarMenu.isEnabled = true // Habilita o botão
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    progressBarContainer.visibility = View.GONE // Esconde a ProgressBar em caso de erro
+                    progressBarContainer.visibility = View.GONE
+                    buttonVoltarMenu.isEnabled = true
                     Toast.makeText(this@EscoposExcluidosActivity, "Erro ao carregar escopos.", Toast.LENGTH_SHORT).show()
                 }
             }
