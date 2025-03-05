@@ -43,11 +43,10 @@ class EscoposExcluidosActivity : AppCompatActivity() {
         }
         carregarNomeUsuario()
         carregarEscoposExcluidos()
-        iniciarContagemRegressiva()
     }
 
     private fun iniciarContagemRegressiva() {
-        val tempoInicial = 60 * 1000L // 1 minuto (para teste, depois altere para 90 dias)
+        val tempoInicial = 90 * 24 * 60 * 60 * 1000L // 1 minuto (para teste, depois altere para 90 dias)
 
         object : CountDownTimer(tempoInicial, 1000) {
             override fun onTick(millisUntilFinished: Long) {
@@ -117,28 +116,36 @@ class EscoposExcluidosActivity : AppCompatActivity() {
                     escoposList.clear()
                     containerExcluidos.removeAllViews()
 
-                    for (document in snapshots) {
-                        val numeroEscopo = when (val numero = document.get("numeroEscopo")) {
-                            is String -> numero
-                            is Long -> numero.toString()
-                            else -> ""
+                    if (snapshots.isEmpty) {
+                        // Se não houver escopos, exibe a mensagem e esconde a contagem regressiva
+                        tvContagemRegressiva.text = "Todos os escopos foram excluídos!"
+                    } else {
+                        // Se houver escopos, popula a tela normalmente
+                        for (document in snapshots) {
+                            val numeroEscopo = when (val numero = document.get("numeroEscopo")) {
+                                is String -> numero
+                                is Long -> numero.toString()
+                                else -> ""
+                            }
+
+                            val escopo = mapOf(
+                                "numeroEscopo" to numeroEscopo,
+                                "tipoServico" to document.getString("tipoServico").orEmpty(),
+                                "empresa" to document.getString("empresa").orEmpty(),
+                                "dataEstimativa" to document.getString("dataEstimativa").orEmpty(),
+                                "status" to document.getString("status").orEmpty(),
+                                "resumoEscopo" to document.getString("resumoEscopo").orEmpty(),
+                                "numeroPedidoCompra" to document.getString("numeroPedidoCompra").orEmpty(),
+                                "motivoExclusao" to document.getString("motivoExclusao").orEmpty(),
+                                "excluidoPor" to (document.getString("excluidoPor") ?: nomeUsuario),
+                                "escopoId" to document.id
+                            )
+
+                            escoposList.add(escopo)
+                            adicionarTextoDinamico(escopo)
                         }
-
-                        val escopo = mapOf(
-                            "numeroEscopo" to numeroEscopo,
-                            "tipoServico" to document.getString("tipoServico").orEmpty(),
-                            "empresa" to document.getString("empresa").orEmpty(),
-                            "dataEstimativa" to document.getString("dataEstimativa").orEmpty(),
-                            "status" to document.getString("status").orEmpty(),
-                            "resumoEscopo" to document.getString("resumoEscopo").orEmpty(),
-                            "numeroPedidoCompra" to document.getString("numeroPedidoCompra").orEmpty(),
-                            "motivoExclusao" to document.getString("motivoExclusao").orEmpty(),
-                            "excluidoPor" to (document.getString("excluidoPor") ?: nomeUsuario),
-                            "escopoId" to document.id
-                        )
-
-                        escoposList.add(escopo)
-                        adicionarTextoDinamico(escopo)
+                        // Se há escopos, inicia a contagem regressiva normalmente
+                        iniciarContagemRegressiva()
                     }
 
                     progressBarContainer.visibility = View.GONE // Esconde a ProgressBar
