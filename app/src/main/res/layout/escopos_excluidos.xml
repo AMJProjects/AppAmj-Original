@@ -7,17 +7,19 @@
     android:padding="0dp"
     tools:context=".EscoposExcluidosActivity">
 
-    <Button
-        android:id="@+id/btnApagarEscopos"
+    <TextView
+        android:id="@+id/tvContagemRegressiva"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Apagar escopos"
-        app:layout_constraintBottom_toTopOf="@+id/scrollView"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:padding="10dp"
+        android:text="Iniciando..."
+        android:textSize="18sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ScrollView
         android:id="@+id/scrollView"
@@ -25,8 +27,10 @@
         android:layout_height="708dp"
         app:layout_constraintBottom_toTopOf="@+id/btnVoltarMenu"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnApagarEscopos">
+        app:layout_constraintTop_toBottomOf="@+id/tvContagemRegressiva"
+        app:layout_constraintVertical_bias="0.5">
 
         <LinearLayout
             android:id="@+id/layoutDinamico"
@@ -42,7 +46,6 @@
         android:id="@+id/btnVoltarMenu"
         android:layout_width="342dp"
         android:layout_height="58dp"
-        android:layout_marginBottom="16dp"
         android:background="@drawable/botaoredondo"
         android:backgroundTint="#8D0000"
         android:text="Voltar ao Menu"
@@ -50,7 +53,10 @@
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/scrollView"
+        app:layout_constraintVertical_bias="0.5" />
 
     <FrameLayout
         android:id="@+id/progressBarContainer"

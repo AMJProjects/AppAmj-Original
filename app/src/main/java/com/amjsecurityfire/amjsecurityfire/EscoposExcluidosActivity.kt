@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import kotlinx.coroutines.*
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -21,6 +22,7 @@ class EscoposExcluidosActivity : AppCompatActivity() {
     private lateinit var containerExcluidos: LinearLayout
     private lateinit var buttonVoltarMenu: Button
     private lateinit var progressBarContainer: FrameLayout
+    private lateinit var tvContagemRegressiva: TextView
     private val escoposList = mutableListOf<Map<String, String>>()
     private var nomeUsuario: String = "Desconhecido"
 
@@ -34,12 +36,52 @@ class EscoposExcluidosActivity : AppCompatActivity() {
         containerExcluidos = findViewById(R.id.layoutDinamico)
         buttonVoltarMenu = findViewById(R.id.btnVoltarMenu)
         progressBarContainer = findViewById(R.id.progressBarContainer)
+        tvContagemRegressiva = findViewById(R.id.tvContagemRegressiva)
 
         buttonVoltarMenu.setOnClickListener {
             finish()
         }
         carregarNomeUsuario()
         carregarEscoposExcluidos()
+        iniciarContagemRegressiva()
+    }
+
+    private fun iniciarContagemRegressiva() {
+        val tempoInicial = 60 * 1000L // 1 minuto (para teste, depois altere para 90 dias)
+
+        object : CountDownTimer(tempoInicial, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                val segundosRestantes = millisUntilFinished / 1000
+                tvContagemRegressiva.text = "Limpando em: $segundosRestantes s"
+            }
+
+            override fun onFinish() {
+                tvContagemRegressiva.text = "Limpando escopos..."
+                excluirEscoposExcluidos()
+            }
+        }.start()
+    }
+
+    private fun excluirEscoposExcluidos() {
+        db.collection("escoposExcluidos")
+            .get()
+            .addOnSuccessListener { documents ->
+                val batch = db.batch()
+                for (document in documents) {
+                    batch.delete(document.reference)
+                }
+                batch.commit()
+                    .addOnSuccessListener {
+                        tvContagemRegressiva.text = "Escopos excluídos!"
+                        containerExcluidos.removeAllViews()
+                    }
+                    .addOnFailureListener {
+                        tvContagemRegressiva.text = "Erro ao excluir escopos!"
+                    }
+            }
+            .addOnFailureListener {
+                tvContagemRegressiva.text = "Erro ao acessar o banco de dados!"
+            }
     }
 
     private fun carregarNomeUsuario() {
