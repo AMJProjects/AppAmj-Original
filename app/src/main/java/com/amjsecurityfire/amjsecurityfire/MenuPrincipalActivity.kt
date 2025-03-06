@@ -6,7 +6,14 @@ import android.util.Log
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -16,10 +23,17 @@ import kotlinx.coroutines.withContext
 
 
 class MenuPrincipalActivity : AppCompatActivity() {
+
+    private lateinit var database: DatabaseReference
+    private lateinit var auth: FirebaseAuth
+    private var cargoUsuario: String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.menu_principal)
 
+        auth = FirebaseAuth.getInstance()
+        database = FirebaseDatabase.getInstance().reference
 
         // Botões principais
         val escoposPendentesButton = findViewById<Button>(R.id.btn_pendente)
@@ -29,71 +43,69 @@ class MenuPrincipalActivity : AppCompatActivity() {
         val perfilButton = findViewById<ImageButton>(R.id.perfil)
         val historicoEscopoButton = findViewById<ImageButton>(R.id.btn_historico)
 
-        // Navegação para as atividades correspondentes
-        escoposPendentesButton.setOnClickListener {
-            val intent = Intent(this, EscoposPendentesActivity::class.java)
-            startActivity(intent)
-        }
+        val user = auth.currentUser
+        if (user != null) {
+            val userId = user.uid
+            val userRef = database.child("users").child(userId)
 
-        adicionarEscopoButton.setOnClickListener {
-            val intent = Intent(this, AdicionarEscopoActivity::class.java)
-            startActivity(intent)
-        }
+            userRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()) {
+                        cargoUsuario = snapshot.child("cargo").getValue(String::class.java) ?: ""
 
-        escoposConcluidosButton.setOnClickListener {
-            val intent = Intent(this, EscoposConcluidosActivity::class.java)
-            startActivity(intent)
-        }
-
-        perfilButton.setOnClickListener {
-            val intent = Intent(this, PerfilActivity::class.java)
-            startActivity(intent)
-        }
-
-        escopoExcluidoButton.setOnClickListener {
-            val intent = Intent(this, EscoposExcluidosActivity::class.java)
-            startActivity(intent)
-        }
-
-        historicoEscopoButton.setOnClickListener {
-            val intent = Intent(this, HistoricosEscoposActivity::class.java)
-            startActivity(intent)
-        }
-    }
-
-    private fun excluirTodosOsEscopos() {
-        CoroutineScope(Dispatchers.IO).launch {
-            val db = FirebaseFirestore.getInstance()
-            val collectionRef = db.collection("escoposExcluidos")
-            val limit = 100
-
-            while (true) {
-                val documents = collectionRef.limit(limit.toLong()).get().await()
-
-                if (documents.isEmpty) {
-                    withContext(Dispatchers.Main) {
-                        showToast("Todos os escopos foram excluídos!")
+                        if (cargoUsuario == "Supervisor") {
+                            configurarPermissoesSupervisor(
+                                escoposPendentesButton,
+                                escoposConcluidosButton,
+                                historicoEscopoButton,
+                                perfilButton,
+                                adicionarEscopoButton,
+                                escopoExcluidoButton
+                            )
+                        }
                     }
-                    break
                 }
 
-                val batch = db.batch()
-                for (document in documents) {
-                    batch.delete(collectionRef.document(document.id))
-                }
+                override fun onCancelled(error: DatabaseError) {}
+            })
+        }
 
-                try {
-                    batch.commit().await()
-                    Log.d("Firestore", "Todos os documentos deletados com sucesso!")
-                } catch (e: Exception) {
-                    Log.w("Firestore", "Erro ao deletar documentos em lote", e)
+        escoposPendentesButton.setOnClickListener { navegarPara(EscoposPendentesActivity::class.java) }
+        adicionarEscopoButton.setOnClickListener { navegarPara(AdicionarEscopoActivity::class.java) }
+        escoposConcluidosButton.setOnClickListener { navegarPara(EscoposConcluidosActivity::class.java) }
+        perfilButton.setOnClickListener { navegarPara(PerfilActivity::class.java) }
+        escopoExcluidoButton.setOnClickListener { navegarPara(EscoposExcluidosActivity::class.java) }
+        historicoEscopoButton.setOnClickListener { navegarPara(HistoricosEscoposActivity::class.java) }
+    }
+        private fun configurarPermissoesSupervisor(
+            escoposPendentes: Button,
+            escoposConcluidos: Button,
+            historicoEscopo: ImageButton,
+            perfil: ImageButton,
+            adicionarEscopo: Button,
+            escopoExcluido: ImageButton
+        ) {
+            val botoesPermitidos = setOf(escoposPendentes, escoposConcluidos, historicoEscopo, perfil)
+
+            val botoesBloqueados = listOf(adicionarEscopo, escopoExcluido).filterNot { it in botoesPermitidos }
+
+            for (botao in botoesBloqueados) {
+                botao.setOnClickListener {
+                    mostrarAlerta()
                 }
             }
         }
-    }
 
+        private fun navegarPara(activityClass: Class<*>) {
+            startActivity(Intent(this, activityClass))
+        }
 
-    private fun showToast(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-    }
+        private fun mostrarAlerta() {
+            AlertDialog.Builder(this)
+                .setTitle("Acesso Negado")
+                .setMessage("Você não tem permissão para acessar esta funcionalidade.")
+                .setPositiveButton("OK", null)
+                .show()
+
+         }
 }
