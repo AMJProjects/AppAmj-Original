@@ -274,32 +274,36 @@ class EscoposConcluidosActivity : AppCompatActivity(){
 
     private fun excluirEscopo(escopo: Map<String, String>) {
         val escopoId = escopo["escopoId"] ?: return
-                val input = EditText(this).apply {
+        val input = EditText(this).apply {
             hint = "Digite o motivo da exclusão"
             setPadding(20, 0, 0, 25)
         }
+
         AlertDialog.Builder(this)
-                .setTitle("Excluir Escopo")
-                .setMessage("Tem certeza de que deseja excluir este escopo permanentemente?")
-                .setView(input)
-                .setPositiveButton("Sim") { _, _ ->
+            .setTitle("Excluir Escopo")
+            .setMessage("Tem certeza de que deseja excluir este escopo permanentemente?")
+            .setView(input)
+            .setPositiveButton("Sim") { _, _ ->
                 val motivo = input.text.toString().trim()
-            if (motivo.isEmpty()) {
-                Toast.makeText(this, "Por favor, informe o motivo da exclusão.", Toast.LENGTH_SHORT).show()
-                return@setPositiveButton
-            }
-            db.collection("escoposConcluidos").document(escopoId).get()
-                    .addOnSuccessListener { document ->
-                if (document.exists()) {
-                    val escopoData = document.data?.toMutableMap() ?: return@addOnSuccessListener
-                            escopoData["motivoExclusao"] = motivo
-                    escopoData["dataExclusao"] = System.currentTimeMillis()
-                    moverDocumentoParaColecao(escopoData, escopoId, "escoposExcluidos", "escoposConcluidos")
+                if (motivo.isEmpty()) {
+                    Toast.makeText(this, "Por favor, informe o motivo da exclusão.", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
                 }
+
+                db.collection("escoposConcluidos").document(escopoId).get()
+                    .addOnSuccessListener { document ->
+                        if (document.exists()) {
+                            val escopoData = document.data?.toMutableMap() ?: return@addOnSuccessListener
+                            escopoData["motivoExclusao"] = motivo
+                            escopoData["dataExclusao"] = System.currentTimeMillis()
+                            escopoData["excluidoPor"] = nomeUsuario  // Salva o nome fixo no momento da exclusão
+
+                            moverDocumentoParaColecao(escopoData, escopoId, "escoposExcluidos", "escoposConcluidos")
+                        }
+                    }
             }
-        }
             .setNegativeButton("Não", null)
-                .show()
+            .show()
     }
 
     private fun moverDocumentoParaColecao(
