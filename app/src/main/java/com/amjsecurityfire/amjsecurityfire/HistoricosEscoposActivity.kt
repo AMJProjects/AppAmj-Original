@@ -34,7 +34,7 @@ class HistoricosEscoposActivity : AppCompatActivity() {
 
     private fun carregarHistorico() {
         db.collection("historicoEscopos")
-            .orderBy("data", Query.Direction.DESCENDING)
+            .orderBy("data", Query.Direction.DESCENDING) // Ordena do mais recente ao mais antigo
             .get()
             .addOnSuccessListener { querySnapshot ->
                 historicoList.clear()
@@ -44,11 +44,14 @@ class HistoricosEscoposActivity : AppCompatActivity() {
                     val usuario = document.getString("usuário") ?: "Usuário desconhecido"
                     val data = document.getString("data") ?: "Data desconhecida"
 
+                    // Se a data estiver no formato completo (exemplo: dd/MM/yyyy HH:mm:ss), use substring para remover a hora
+                    val dataFormatada = if (data.length >= 10) data.substring(0, 10) else data
+
                     // Formata a informação para exibição
                     val historicoInfo = "Escopo: #$numeroEscopo\n" +
                             "Ação: $acao\n" +
                             "Realizado por: $usuario\n" +
-                            "Data: $data"
+                            "Data: $dataFormatada"
                     historicoList.add(historicoInfo)
                 }
 
@@ -61,5 +64,4 @@ class HistoricosEscoposActivity : AppCompatActivity() {
                 Toast.makeText(this, "Erro ao carregar histórico: ${exception.message}", Toast.LENGTH_SHORT).show()
             }
     }
-
 }
