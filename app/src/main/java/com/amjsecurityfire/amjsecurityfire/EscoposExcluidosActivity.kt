@@ -1,6 +1,7 @@
 package com.amjsecurityfire.amjsecurityfire
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import kotlinx.coroutines.*
 import android.os.Bundle
@@ -25,6 +26,9 @@ class EscoposExcluidosActivity : AppCompatActivity() {
     private lateinit var tvContagemRegressiva: TextView
     private val escoposList = mutableListOf<Map<String, String>>()
     private var nomeUsuario: String = "Desconhecido"
+    private val PREFS_NAME = "escopos_prefs"
+    private val KEY_TIMESTAMP_FINAL = "timestamp_final"
+    private var countDownTimer: CountDownTimer? = null
 
 
     @SuppressLint("MissingInflatedId")
@@ -46,12 +50,22 @@ class EscoposExcluidosActivity : AppCompatActivity() {
     }
 
     private fun iniciarContagemRegressiva() {
-        val tempoInicial = 90 * 24 * 60 * 60 * 1000L // 1 minuto (para teste, depois altere para 90 dias)
+        val sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val tempoAtual = System.currentTimeMillis()
+        val tempoFinalSalvo = sharedPreferences.getLong(KEY_TIMESTAMP_FINAL, 0)
 
-        object : CountDownTimer(tempoInicial, 1000) {
+        val tempoRestante = if (tempoFinalSalvo > tempoAtual) {
+            tempoFinalSalvo - tempoAtual
+        } else {
+            90 * 24 * 60 * 60 * 1000L // 90 dias em milissegundos
+        }
+
+        countDownTimer?.cancel() // Cancela qualquer contagem anterior
+
+        countDownTimer = object : CountDownTimer(tempoRestante, 24 * 60 * 60 * 1000L) { // Atualiza a cada dia
             override fun onTick(millisUntilFinished: Long) {
-                val segundosRestantes = millisUntilFinished / 1000
-                tvContagemRegressiva.text = "Limpando em: $segundosRestantes s"
+                val diasRestantes = millisUntilFinished / (1000 * 60 * 60 * 24)
+                tvContagemRegressiva.text = "Limpando em: $diasRestantes dias"
             }
 
             override fun onFinish() {
@@ -59,6 +73,14 @@ class EscoposExcluidosActivity : AppCompatActivity() {
                 excluirEscoposExcluidos()
             }
         }.start()
+
+        // Salva o novo timestamp final
+        sharedPreferences.edit().putLong(KEY_TIMESTAMP_FINAL, tempoAtual + tempoRestante).apply()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        countDownTimer?.cancel() // Cancela o timer ao sair da tela
     }
 
     private fun excluirEscoposExcluidos() {
