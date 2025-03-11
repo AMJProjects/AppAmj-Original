@@ -75,8 +75,8 @@
     <!-- ListView para exibir os itens -->
     <ListView
         android:id="@+id/listViewHistorico"
-        android:layout_width="411dp"
-        android:layout_height="585dp"
+        android:layout_width="409dp"
+        android:layout_height="533dp"
         android:background="#FFFFFF"
         android:divider="@android:color/darker_gray"
         android:dividerHeight="1dp"
@@ -92,7 +92,7 @@
         android:id="@+id/button4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
+        android:layout_marginBottom="16dp"
         android:background="@drawable/botaoredondo"
         android:backgroundTint="#8D0000"
         android:contentDescription="Botão voltar ao menu"
