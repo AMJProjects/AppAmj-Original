@@ -333,7 +333,7 @@ class AdicionarEscopoActivity : AppCompatActivity(){
             escoposCollection.document(escopoId)
                 .update(novoEscopo)
                 .addOnSuccessListener {
-                    registrarHistoricoEscopo(numeroEscopo, usuarioNome, acao, dataAcao)
+                    registrarHistoricoEscopo(numeroEscopo, usuarioNome, acao, dataAcao, status) // Passar o status
                     Toast.makeText(this, "Escopo atualizado!", Toast.LENGTH_SHORT).show()
                     finish()
                 }
@@ -343,7 +343,7 @@ class AdicionarEscopoActivity : AppCompatActivity(){
         } else {
             escoposCollection.add(novoEscopo)
                 .addOnSuccessListener {
-                    registrarHistoricoEscopo(numeroEscopo, usuarioNome, acao, dataAcao)
+                    registrarHistoricoEscopo(numeroEscopo, usuarioNome, acao, dataAcao, status) // Passar o status
                     Toast.makeText(this, "Escopo criado!", Toast.LENGTH_SHORT).show()
                     finish()
                 }
@@ -358,13 +358,15 @@ class AdicionarEscopoActivity : AppCompatActivity(){
         numeroEscopo: Int,
         usuario: String,
         acao: String,
-        data: String
+        data: String,
+        status: String // Adicionar o parâmetro status
     ) {
         val historico = hashMapOf(
             "número do escopo" to numeroEscopo,
             "ação" to acao,
             "usuário" to usuario,
-            "data" to data
+            "data" to data,
+            "status" to status // Incluir o status no mapa
         )
 
         db.collection("historicoEscopos")

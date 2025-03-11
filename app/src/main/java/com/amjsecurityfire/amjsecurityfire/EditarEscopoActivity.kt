@@ -82,6 +82,7 @@ class EditarEscopoActivity : AppCompatActivity() {
                         val resumoEscopo = document.getString("resumoEscopo") ?: ""
                         val tipoServico = document.getString("tipoServico") ?: ""
                         val numeroPedidoCompra = document.getString("numeroPedidoCompra") ?: ""
+                        val status = document.getString("status") ?: "Pendente" // Recupera o status
 
                         empresaEditText.setText(empresa)
                         dataEstimativaEditText.setText(dataEstimativa)
@@ -102,6 +103,7 @@ class EditarEscopoActivity : AppCompatActivity() {
                                     val resumoEscopo = docConcluido.getString("resumoEscopo") ?: ""
                                     val tipoServico = docConcluido.getString("tipoServico") ?: ""
                                     val numeroPedidoCompra = docConcluido.getString("numeroPedidoCompra") ?: ""
+                                    val status = docConcluido.getString("status") ?: "Concluído" // Recupera o status
 
                                     empresaEditText.setText(empresa)
                                     dataEstimativaEditText.setText(dataEstimativa)
@@ -155,18 +157,20 @@ class EditarEscopoActivity : AppCompatActivity() {
                             val dataFormatadaAjustada = dataFormatada.replace("2025", "25")
 
                             val numeroEscopo = intent.getStringExtra("numeroEscopo")?.toLongOrNull() ?: 0L
+                            val status = intent.getStringExtra("status") ?: "Pendente" // Recupera o status da Intent
 
-                            // 2) Ao salvar no histórico, use a variável 'usuarioNome'
+                            // 2) Ao salvar no histórico, use a variável 'usuarioNome' e inclua o status
                             val historicoDados = hashMapOf(
                                 "ação" to "Edição",
                                 "data" to dataFormatadaAjustada,
                                 "número do escopo" to numeroEscopo,
-                                "usuário" to usuarioNome // Aqui usamos o valor vindo do Realtime DB
+                                "usuário" to usuarioNome, // Aqui usamos o valor vindo do Realtime DB
+                                "status" to status // Inclui o status no histórico
                             )
 
                             db.collection("historicoEscopos").add(historicoDados)
                                 .addOnSuccessListener {
-                                    Log.d("EditarEscopo", "Histórico de edição registrado com sucesso! (usuário=$usuarioNome)")
+                                    Log.d("EditarEscopo", "Histórico de edição registrado com sucesso! (usuário=$usuarioNome, status=$status)")
                                 }
                                 .addOnFailureListener { e ->
                                     Log.e("EditarEscopo", "Erro ao registrar histórico de edição: ${e.message}")

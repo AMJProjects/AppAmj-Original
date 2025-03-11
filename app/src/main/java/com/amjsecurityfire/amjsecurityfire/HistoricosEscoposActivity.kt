@@ -43,15 +43,17 @@ class HistoricosEscoposActivity : AppCompatActivity() {
                     val acao = document.getString("ação") ?: "Ação desconhecida"
                     val usuario = document.getString("usuário") ?: "Usuário desconhecido"
                     val data = document.getString("data") ?: "Data desconhecida"
+                    val status = document.getString("status") ?: "Status desconhecido" // Recupera o status
 
                     // Se a data estiver no formato completo (exemplo: dd/MM/yyyy HH:mm:ss), use substring para remover a hora
                     val dataFormatada = if (data.length >= 10) data.substring(0, 10) else data
 
-                    // Formata a informação para exibição
+                    // Formata a informação para exibição, incluindo o status
                     val historicoInfo = "Escopo: #$numeroEscopo\n" +
                             "Ação: $acao\n" +
                             "Realizado por: $usuario\n" +
-                            "Data: $dataFormatada"
+                            "Data: $dataFormatada\n" +
+                            "Status: $status" // Adiciona o status à string formatada
                     historicoList.add(historicoInfo)
                 }
 

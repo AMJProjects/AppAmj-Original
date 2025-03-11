@@ -6,11 +6,6 @@
     android:layout_height="match_parent"
     android:background="@drawable/bg_escopos">
 
-    <!-- SearchView para pesquisa -->
-
-    <!-- Título do histórico -->
-
-    <!-- ScrollView para permitir rolagem do conteúdo -->
 
     <SearchView
         android:id="@+id/searchView"
