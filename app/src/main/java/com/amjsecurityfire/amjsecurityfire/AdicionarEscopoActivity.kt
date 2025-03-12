@@ -1,6 +1,7 @@
 package com.amjsecurityfire.amjsecurityfire;
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -21,6 +22,7 @@ import android.app.DatePickerDialog
 import java.text.SimpleDateFormat
 import java.util.*
 import android.widget.EditText
+import androidx.core.content.ContextCompat
 import java.util.Locale
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -192,12 +194,13 @@ class AdicionarEscopoActivity : AppCompatActivity(){
                 pdfUri = uri
                 val fileName = uri.lastPathSegment ?: "PDF selecionado"
                 pdfStatusTextView.text = fileName
-                pdfStatusTextView.setTextColor(getColor(R.color.teal_700))
+                pdfStatusTextView.setTextColor(ContextCompat.getColor(this, R.color.teal_700))
             }
         }
 
         attachPdfButton.setOnClickListener {
             getPdfLauncher.launch("application/pdf")
+            openFilePicker()
         }
 
         // Botão de salvar
@@ -382,22 +385,46 @@ class AdicionarEscopoActivity : AppCompatActivity(){
 
 
     private fun uploadPdfToStorage(onSuccess: (String?) -> Unit, onFailure: (Exception) -> Unit) {
-        if (pdfUri != null) {
+        pdfUri?.let { uri ->
             val storageRef = FirebaseStorage.getInstance().reference
             val pdfRef = storageRef.child("pdfs/${System.currentTimeMillis()}.pdf")
 
-            pdfRef.putFile(pdfUri!!)
-                .addOnSuccessListener { taskSnapshot ->
-                    pdfRef.downloadUrl.addOnSuccessListener { uri ->
-                    onSuccess(uri.toString())
-            }
-            }
-                .addOnFailureListener { exception ->
+            try {
+                val inputStream = contentResolver.openInputStream(uri) ?: throw Exception("Não foi possível abrir o arquivo")
+                val uploadTask = pdfRef.putStream(inputStream)
+
+                uploadTask.addOnSuccessListener {
+                    pdfRef.downloadUrl.addOnSuccessListener { url ->
+                        onSuccess(url.toString())
+                    }
+                }.addOnFailureListener { exception ->
                     onFailure(exception)
+                }
+            } catch (e: Exception) {
+                onFailure(e)
             }
-        } else {
-            onSuccess(null)
+        } ?: onFailure(Exception("Arquivo PDF não selecionado"))
+    }
+
+    private val pickPdfLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            result.data?.data?.let { uri ->
+                pdfUri = uri
+                contentResolver.takePersistableUriPermission(pdfUri!!, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                uploadPdfToStorage(
+                    onSuccess = { url -> Log.d("Upload", "Sucesso: $url") },
+                    onFailure = { e -> Log.e("Upload", "Erro: ${e.message}") }
+                )
+            }
         }
+    }
+
+    private fun openFilePicker() {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "application/pdf"
+        }
+        pickPdfLauncher.launch(intent)
     }
 
 

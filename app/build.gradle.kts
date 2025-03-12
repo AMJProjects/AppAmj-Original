@@ -13,7 +13,7 @@ android {
         applicationId = "com.amjsecurityfire.amjsecurityfire"
         minSdk = 23
         targetSdk = 34
-        versionCode = 5
+        versionCode = 6
         versionName = "1.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
