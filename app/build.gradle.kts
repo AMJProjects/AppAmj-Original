@@ -13,8 +13,8 @@ android {
         applicationId = "com.amjsecurityfire.amjsecurityfire"
         minSdk = 23
         targetSdk = 34
-        versionCode = 6
-        versionName = "1.3"
+        versionCode = 7
+        versionName = "1.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -50,7 +50,7 @@ android {
 
 dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.appcompat:appcompat:1.6.1") // Remover a versão duplicada
+    implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.core:core-ktx:1.10.1")
     implementation("com.squareup.okio:okio:2.10.0")
     implementation(platform("com.google.firebase:firebase-bom:33.9.0"))
