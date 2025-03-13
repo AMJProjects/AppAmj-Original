@@ -1,6 +1,5 @@
 package com.amjsecurityfire.amjsecurityfire;
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -37,14 +36,12 @@ class AdicionarEscopoActivity : AppCompatActivity(){
     private var ultimoNumeroEscopo: Int = 0
     private lateinit var usuarioNome: String
     private var pdfUri: Uri? = null
-    private val PDF_REQUEST_CODE = 100
 
     private lateinit var salvarButton: Button
     private lateinit var cancelarButton: Button
     private lateinit var attachPdfButton: Button
     private lateinit var pdfStatusTextView: TextView
 
-    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.add_escopo)
@@ -200,7 +197,6 @@ class AdicionarEscopoActivity : AppCompatActivity(){
 
         attachPdfButton.setOnClickListener {
             getPdfLauncher.launch("application/pdf")
-            openFilePicker()
         }
 
         // Botão de salvar
@@ -411,10 +407,7 @@ class AdicionarEscopoActivity : AppCompatActivity(){
             result.data?.data?.let { uri ->
                 pdfUri = uri
                 contentResolver.takePersistableUriPermission(pdfUri!!, Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                uploadPdfToStorage(
-                    onSuccess = { url -> Log.d("Upload", "Sucesso: $url") },
-                    onFailure = { e -> Log.e("Upload", "Erro: ${e.message}") }
-                )
+                pdfStatusTextView.text = "PDF Selecionado"
             }
         }
     }
