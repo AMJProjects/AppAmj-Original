@@ -13,8 +13,8 @@ android {
         applicationId = "com.amjsecurityfire.amjsecurityfire"
         minSdk = 23
         targetSdk = 34
-        versionCode = 8
-        versionName = "1.5"
+        versionCode = 11
+        versionName = "1.8"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -40,7 +40,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.15" // Atualize para a versão mais recente
+        kotlinCompilerExtensionVersion = "1.5.15"
     }
 
     viewBinding {

@@ -18,6 +18,8 @@ import android.util.Log
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import android.app.DatePickerDialog
+import android.database.Cursor
+import android.provider.MediaStore
 import java.text.SimpleDateFormat
 import java.util.*
 import android.widget.EditText
@@ -186,17 +188,29 @@ class AdicionarEscopoActivity : AppCompatActivity(){
         }
 
         // Botão de anexar PDF com ActivityResultContracts
-        val getPdfLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-            if (uri != null) {
-                pdfUri = uri
-                val fileName = uri.lastPathSegment ?: "PDF selecionado"
-                pdfStatusTextView.text = fileName
-                pdfStatusTextView.setTextColor(ContextCompat.getColor(this, R.color.teal_700))
+        val getPdfLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val uri: Uri? = result.data?.data
+                uri?.let {
+                    // Com MediaStore, você já tem a permissão para acessar o arquivo
+                    if (isPdfFile(it)) {
+                        pdfUri = it
+                        val fileName = getFileNameFromUri(it)
+                        pdfStatusTextView.text = fileName
+                        pdfStatusTextView.setTextColor(ContextCompat.getColor(this, R.color.teal_700))
+                    } else {
+                        Toast.makeText(this, "Selecione um arquivo PDF.", Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
         }
 
         attachPdfButton.setOnClickListener {
-            getPdfLauncher.launch("application/pdf")
+            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                addCategory(Intent.CATEGORY_OPENABLE)
+                type = "application/pdf"
+            }
+            pickPdfLauncher.launch(intent)
         }
 
         // Botão de salvar
@@ -221,7 +235,6 @@ class AdicionarEscopoActivity : AppCompatActivity(){
             // Verificar se o PDF foi anexado
             if (pdfUri == null) {
                 Toast.makeText(this, "Por favor, anexe um arquivo PDF antes de salvar.", Toast.LENGTH_SHORT).show()
-                toggleProgress(false)
                 return@setOnClickListener
             }
 
@@ -284,6 +297,30 @@ class AdicionarEscopoActivity : AppCompatActivity(){
         // Botão de cancelar
         cancelarButton.setOnClickListener {
             finish()
+        }
+    }
+
+    private fun isPdfFile(uri: Uri): Boolean {
+        return contentResolver.getType(uri) == "application/pdf"
+    }
+
+    private fun getFileNameFromUri(uri: Uri): String {
+        var cursor: Cursor? = null
+        return try {
+            val projection = arrayOf(MediaStore.MediaColumns.DISPLAY_NAME)
+            cursor = contentResolver.query(uri, projection, null, null, null)
+            cursor?.use {
+                if (it.moveToFirst()) {
+                    val columnIndex = it.getColumnIndexOrThrow(MediaStore.MediaColumns.DISPLAY_NAME)
+                    it.getString(columnIndex) ?: "Arquivo PDF"
+                } else {
+                    "Arquivo PDF"
+                }
+            } ?: "Arquivo PDF"
+        } catch (e: Exception) {
+            "Arquivo PDF"
+        } finally {
+            cursor?.close()
         }
     }
 
@@ -378,8 +415,6 @@ class AdicionarEscopoActivity : AppCompatActivity(){
             }
     }
 
-
-
     private fun uploadPdfToStorage(onSuccess: (String?) -> Unit, onFailure: (Exception) -> Unit) {
         pdfUri?.let { uri ->
             val storageRef = FirebaseStorage.getInstance().reference
@@ -405,9 +440,14 @@ class AdicionarEscopoActivity : AppCompatActivity(){
     private val pickPdfLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             result.data?.data?.let { uri ->
-                pdfUri = uri
-                contentResolver.takePersistableUriPermission(pdfUri!!, Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                pdfStatusTextView.text = "PDF Selecionado"
+                contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                if (isPdfFile(uri)) {
+                    pdfUri = uri
+                    pdfStatusTextView.text = getFileNameFromUri(uri)
+                    pdfStatusTextView.setTextColor(ContextCompat.getColor(this, R.color.teal_700))
+                } else {
+                    Toast.makeText(this, "Selecione um arquivo PDF válido.", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
