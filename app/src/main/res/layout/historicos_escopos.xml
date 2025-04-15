@@ -6,10 +6,10 @@
     android:layout_height="match_parent"
     android:background="@drawable/bg_escopos">
 
-
+    <!-- ListView ocupando o espaço do ScrollView -->
     <SearchView
         android:id="@+id/searchView"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="104dp"
         android:backgroundTint="#FFFFFF"
@@ -23,7 +23,7 @@
 
     <TextView
         android:id="@+id/textView"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:background="#8E0000"
@@ -38,56 +38,23 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/searchView" />
 
-    <ScrollView
-        android:id="@+id/scrollView"
-        android:layout_width="411dp"
-        android:layout_height="591dp"
-        android:padding="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/button4"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textView">
-
-        <LinearLayout
-            android:id="@+id/layoutDinamico"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="8dp">
-
-            <!-- Exemplo de item de escopo -->
-            <TextView
-                android:id="@+id/textViewExemplo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:background="#F0F0F0"
-                android:contentDescription="Texto de escopo, exemplo"
-                android:elevation="2dp"
-                android:importantForAccessibility="yes"
-                android:padding="12dp"
-                android:text="Exemplo de item de escopo"
-                android:textColor="#000000"
-                android:textSize="16sp" />
-        </LinearLayout>
-    </ScrollView>
-
-    <!-- ListView para exibir os itens -->
+    <!-- Botão de voltar -->
     <ListView
         android:id="@+id/listViewHistorico"
-        android:layout_width="409dp"
-        android:layout_height="533dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:background="#FFFFFF"
         android:divider="@android:color/darker_gray"
         android:dividerHeight="1dp"
         android:elevation="2dp"
         android:padding="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/button4"
+        app:layout_constraintBottom_toTopOf="@id/button4"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textView" />
+        app:layout_constraintTop_toBottomOf="@id/textView"
+        app:layout_constraintVertical_bias="0.0" />
 
-    <!-- Botão de voltar -->
     <Button
         android:id="@+id/button4"
         android:layout_width="wrap_content"
@@ -102,6 +69,6 @@
         android:textColor="#FFFFFF"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

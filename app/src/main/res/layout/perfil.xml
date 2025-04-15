@@ -4,121 +4,124 @@
     android:id="@+id/linearLayout2"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_perfil">
+    android:background="@drawable/bg_perfil"
+    tools:context=".PerfilActivity">
 
+    <!-- Botões no topo -->
     <ImageButton
         android:id="@+id/btn_voltar"
-        android:layout_width="39dp"
-        android:layout_height="39dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:background="@color/white"
         android:scaleType="fitCenter"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/btn_logout"
-        app:layout_constraintHorizontal_bias="0.049"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.062"
         app:srcCompat="@drawable/setinha_preta"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_margin="16dp"
         tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 
     <ImageButton
         android:id="@+id/btn_logout"
-        android:layout_width="35dp"
-        android:layout_height="34dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:background="@color/white"
         android:scaleType="fitCenter"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.957"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.063"
         app:srcCompat="@drawable/logout"
-        tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck"/>
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="16dp"
+        tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 
+    <!-- Diretriz para centralizar parte principal -->
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_top_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.18" />
+
+    <!-- Perfil -->
     <ImageView
         android:id="@+id/imageView4"
-        android:layout_width="132dp"
-        android:layout_height="161dp"
+        android:layout_width="120dp"
+        android:layout_height="140dp"
         android:src="@drawable/icon_perfil"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/guideline_top_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.159" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <TextView
         android:id="@+id/tvNome"
-        android:layout_width="365dp"
-        android:layout_height="40dp"
-        android:layout_marginBottom="24dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="32dp"
         android:background="@drawable/botaoredondo"
         android:backgroundTint="#ADADAD"
-        android:paddingLeft="20dp"
-        android:paddingTop="7dp"
+        android:padding="8dp"
         android:text="Nome do Usuário"
         android:textColor="#211F1F"
-        android:textStyle="bold"
         android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/tvEmail"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintTop_toBottomOf="@id/imageView4" />
+
+    <TextView
+        android:id="@+id/tvEmail"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="32dp"
+        android:background="@drawable/botaoredondo"
+        android:backgroundTint="#ADADAD"
+        android:maxLines="2"
+        android:padding="8dp"
+        android:text="Email do Usuário"
+        android:textColor="#211F1F"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvNome" />
 
     <TextView
         android:id="@+id/tvCargo"
-        android:layout_width="360dp"
-        android:layout_height="40dp"
-        android:layout_marginBottom="28dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
         android:background="@drawable/botaoredondo"
         android:backgroundTint="#ADADAD"
-        android:paddingLeft="20dp"
-        android:paddingTop="7dp"
+        android:padding="8dp"
         android:text="Cargo do Usuário"
         android:textColor="#211F1F"
         android:textStyle="bold"
         android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/btn_editar_perfil"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvEmail"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
-    <TextView
-        android:id="@+id/tvEmail"
-        android:layout_width="363dp"
-        android:layout_height="41dp"
-        android:layout_marginBottom="20dp"
-        android:background="@drawable/botaoredondo"
-        android:backgroundTint="#ADADAD"
-        android:paddingLeft="10dp"
-        android:paddingTop="7dp"
-        android:text="Email do Usuário"
-        android:textColor="#211F1F"
-        android:textStyle="bold"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/tvCargo"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.52"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
-
+    <!-- Botão -->
     <Button
         android:id="@+id/btn_editar_perfil"
-        android:layout_width="151dp"
-        android:layout_height="42dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
         android:background="@drawable/botaoredondo"
         android:backgroundTint="#530303"
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="12dp"
         android:text="Editar Perfil"
         android:textColor="@color/white"
         android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvCargo"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.671"
-        tools:ignore="MissingConstraints,TouchTargetSizeCheck" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

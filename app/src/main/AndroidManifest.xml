@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.amjsecurityfire.amjsecurityfire">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Permissões necessárias -->
     <uses-permission android:name="android.permission.INTERNET" />
@@ -28,17 +27,17 @@
 
         <!-- Menu Principal Activity -->
         <activity
-            android:name="com.amjsecurityfire.amjsecurityfire.MenuPrincipalActivity"
+            android:name="com.amjsecurityfire.amjsecurity.MenuPrincipalActivity"
             android:exported="true" />
 
         <!-- Tela de Recuperação de Senha -->
         <activity
-            android:name="com.amjsecurityfire.amjsecurityfire.EsqueciSenhaActivity"
+            android:name="com.amjsecurityfire.amjsecurity.EsqueciSenhaActivity"
             android:exported="false" />
 
         <!-- Tela de Login (Principal) -->
         <activity
-            android:name="com.amjsecurityfire.amjsecurityfire.MainActivity"
+            android:name="com.amjsecurityfire.amjsecurity.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.APPAMJ">
@@ -48,16 +47,17 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.amjsecurityfire.amjsecurityfire.RegistroActivity" />
-        <activity android:name=".AdicionarEscopoActivity" />
-        <activity android:name=".EscoposPendentesActivity" />
-        <activity android:name=".EscoposConcluidosActivity" />
-        <activity android:name=".PerfilActivity" />
-        <activity android:name=".EditarPerfilActivity" />
-        <activity android:name=".DetalhesEscopoActivity" />
-        <activity android:name=".EditarEscopoActivity" />
-        <activity android:name=".HistoricosEscoposActivity" />
-        <activity android:name=".EscoposExcluidosActivity" />
+        <activity android:name="com.amjsecurityfire.amjsecurity.RegistroActivity" />
+        <activity android:name="com.amjsecurityfire.amjsecurity.AdicionarEscopoActivity" />
+        <activity android:name="com.amjsecurityfire.amjsecurity.AguardandoAprovacaoActivity"/>
+        <activity android:name="com.amjsecurityfire.amjsecurity.EscoposPendentesActivity" />
+        <activity android:name="com.amjsecurityfire.amjsecurity.EscoposConcluidosActivity" />
+        <activity android:name="com.amjsecurityfire.amjsecurity.PerfilActivity" />
+        <activity android:name="com.amjsecurityfire.amjsecurity.EditarPerfilActivity" />
+        <activity android:name="com.amjsecurityfire.amjsecurity.DetalhesEscopoActivity" />
+        <activity android:name="com.amjsecurityfire.amjsecurity.EditarEscopoActivity" />
+        <activity android:name="com.amjsecurityfire.amjsecurity.HistoricosEscoposActivity" />
+        <activity android:name="com.amjsecurityfire.amjsecurity.EscoposExcluidosActivity" />
 
     </application>
 

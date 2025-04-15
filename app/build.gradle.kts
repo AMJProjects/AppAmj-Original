@@ -6,15 +6,15 @@ plugins {
 }
 
 android {
-    namespace = "com.amjsecurityfire.amjsecurityfire"
+    namespace = "com.amjsecurityfire.amjsecurity"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.amjsecurityfire.amjsecurityfire"
+        applicationId = "com.amjsecurityfire.amjsecurity"
         minSdk = 23
         targetSdk = 34
-        versionCode = 11
-        versionName = "1.8"
+        versionCode = 3
+        versionName = "1.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -37,6 +37,7 @@ android {
     }
     buildFeatures {
         compose = true
+        dataBinding = true
     }
 
     composeOptions {
@@ -75,6 +76,7 @@ dependencies {
     implementation("androidx.work:work-runtime-ktx:2.7.1")
 
     implementation("com.github.bumptech.glide:glide:4.12.0")
+    implementation(libs.constraintlayout)
     annotationProcessor("com.github.bumptech.glide:compiler:4.12.0")
 
     // Testes
