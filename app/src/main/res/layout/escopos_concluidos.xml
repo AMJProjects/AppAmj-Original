@@ -30,7 +30,7 @@
         android:background="#8E0000"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
-        android:text="Escopos pendentes"
+        android:text="Escopos concluídos"
         android:textAlignment="center"
         android:textColor="#FFFFFF"
         android:textSize="16sp"

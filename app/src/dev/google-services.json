@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "1051108943832",
+    "firebase_url": "https://amj-security-fire-dev-default-rtdb.firebaseio.com",
+    "project_id": "amj-security-fire-dev",
+    "storage_bucket": "amj-security-fire-dev.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1051108943832:android:1a7fb2d0f73ee0a695f4ad",
+        "android_client_info": {
+          "package_name": "com.amjsecurityfire.amjsecurity"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD3-oDTfTK85ua0qZ8C6L1tdFs0gK9fzIw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1051108943832:android:e1663e42368e358395f4ad",
+        "android_client_info": {
+          "package_name": "com.amjsecurityfire.amjsecurity.dev"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD3-oDTfTK85ua0qZ8C6L1tdFs0gK9fzIw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -13,13 +13,23 @@ android {
         applicationId = "com.amjsecurityfire.amjsecurity"
         minSdk = 23
         targetSdk = 34
-        versionCode = 3
-        versionName = "1.2"
-
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 6
+        versionName = "1.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    flavorDimensions += "environment"
+
+    productFlavors {
+        create("dev") {
+            dimension = "environment"
+            applicationIdSuffix = ".dev"
+            versionNameSuffix = "-dev"
+        }
+        create("prod") {
+            dimension = "environment"
+        }
     }
 
     buildTypes {
@@ -31,13 +41,16 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     kotlinOptions {
         jvmTarget = "11"
     }
+
     buildFeatures {
         compose = true
         dataBinding = true
@@ -62,8 +75,9 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore:25.1.2")
     implementation("com.google.android.gms:play-services-base:18.5.0")
     implementation("com.google.firebase:firebase-appcheck-playintegrity:16.1.0")
+    implementation("com.google.firebase:firebase-messaging:24.1.0")
 
-    // Dependências do Compose
+    // Compose
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
@@ -89,7 +103,7 @@ dependencies {
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
 
-    // Depurações
+    // Depuração
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }

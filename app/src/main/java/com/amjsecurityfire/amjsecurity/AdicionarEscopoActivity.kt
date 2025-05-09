@@ -50,6 +50,7 @@ class AdicionarEscopoActivity : AppCompatActivity(){
 
         db = FirebaseFirestore.getInstance()
 
+
         // Inicializar o Firebase App Check
         val firebaseAppCheck = FirebaseAppCheck.getInstance()
         firebaseAppCheck.installAppCheckProviderFactory(
@@ -277,7 +278,7 @@ class AdicionarEscopoActivity : AppCompatActivity(){
                             )
 
                             // Salvar no Firestore
-                            salvarNoFirestore(status, novoEscopo, editMode, escopoId)
+                            salvarNoFirestore(this, status, novoEscopo, editMode, escopoId)
 
                             // Esconder ProgressBar e a tela embaçada
                             toggleProgress(false)
@@ -347,7 +348,7 @@ class AdicionarEscopoActivity : AppCompatActivity(){
 
     // Dentro da classe AdicionarEscopoActivity
 
-    private fun salvarNoFirestore(status: String, novoEscopo: Map<String, Any>, editMode: Boolean, escopoId: String?) {
+    private fun salvarNoFirestore(context: Context, status: String, novoEscopo: Map<String, Any>, editMode: Boolean, escopoId: String?) {
         val escoposCollection = if (status == "Concluído") {
             db.collection("escoposConcluidos")
         } else {
@@ -369,7 +370,7 @@ class AdicionarEscopoActivity : AppCompatActivity(){
             escoposCollection.document(escopoId)
                 .update(novoEscopo)
                 .addOnSuccessListener {
-                    registrarHistoricoEscopo(numeroEscopo, usuarioNome, acao, dataAcao, status) // Passar o status
+                    registrarHistoricoEscopo(numeroEscopo, usuarioNome, acao, dataAcao, status)
                     Toast.makeText(this, "Escopo atualizado!", Toast.LENGTH_SHORT).show()
                     finish()
                 }
@@ -380,6 +381,7 @@ class AdicionarEscopoActivity : AppCompatActivity(){
             escoposCollection.add(novoEscopo)
                 .addOnSuccessListener {
                     registrarHistoricoEscopo(numeroEscopo, usuarioNome, acao, dataAcao, status) // Passar o status
+
                     Toast.makeText(this, "Escopo criado!", Toast.LENGTH_SHORT).show()
                     finish()
                 }

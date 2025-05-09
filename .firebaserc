@@ -1,0 +1,8 @@
+{
+  "projects": {
+    "default": "amj-security-fire",
+    "dev": "amj-security-fire-dev"
+  },
+  "targets": {},
+  "etags": {}
+}

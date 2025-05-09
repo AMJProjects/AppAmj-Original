@@ -324,26 +324,28 @@ class EscoposPendentesActivity : AppCompatActivity(){
     }
 
     private fun moverDocumentoParaColecao(
-            dadosAtualizados: MutableMap<String, Any>,
-    escopoId: String,
-            novaColecao: String,
-            colecaoAtual: String
+        dadosAtualizados: MutableMap<String, Any>,
+        escopoId: String,
+        novaColecao: String,
+        colecaoAtual: String
     ) {
-        db.collection(novaColecao).document(escopoId)
-                .set(dadosAtualizados)
-                .addOnSuccessListener {
-            db.collection(colecaoAtual).document(escopoId).delete()
-                    .addOnSuccessListener {
-                Toast.makeText(this, "Operação concluída com sucesso!", Toast.LENGTH_SHORT).show()
+        val batch = db.batch()
+        val docNova = db.collection(novaColecao).document(escopoId)
+        val docAtual = db.collection(colecaoAtual).document(escopoId)
+
+        // Marca que esse documento está sendo movido, para evitar notificação duplicada
+        dadosAtualizados["origem"] = "movido"
+
+        batch.set(docNova, dadosAtualizados)
+        batch.delete(docAtual)
+
+        batch.commit()
+            .addOnSuccessListener {
+                Toast.makeText(this, "Escopo movido com sucesso!", Toast.LENGTH_SHORT).show()
                 carregarEscoposPendentes()
             }
-                    .addOnFailureListener { e ->
-                    Toast.makeText(this, "Erro ao remover escopo da coleção atual: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
-        }
             .addOnFailureListener { e ->
                 Toast.makeText(this, "Erro ao mover escopo: ${e.message}", Toast.LENGTH_SHORT).show()
-        }
+            }
     }
-
 }

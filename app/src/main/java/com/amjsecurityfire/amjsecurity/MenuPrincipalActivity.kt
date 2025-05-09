@@ -2,6 +2,7 @@ package com.amjsecurityfire.amjsecurity;
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.ImageButton
 import androidx.appcompat.app.AlertDialog
@@ -12,6 +13,11 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.messaging.FirebaseMessaging
+import android.os.Build
+import androidx.core.content.ContextCompat
+import android.content.pm.PackageManager
+import androidx.core.app.ActivityCompat
 
 
 class MenuPrincipalActivity : AppCompatActivity() {
@@ -34,6 +40,21 @@ class MenuPrincipalActivity : AppCompatActivity() {
         val escopoExcluidoButton = findViewById<ImageButton>(R.id.btn_lixo)
         val perfilButton = findViewById<ImageButton>(R.id.perfil)
         val historicoEscopoButton = findViewById<ImageButton>(R.id.btn_historico)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 1001)
+        }
+
+        NotificationHelper.createNotificationChannel(this)
+
+        FirebaseMessaging.getInstance().subscribeToTopic("escopos")
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.d("FCM", "Inscrito no tópico 'escopos'")
+                } else {
+                    Log.e("FCM", "Erro ao inscrever no tópico", task.exception)
+                }
+            }
 
         val user = auth.currentUser
         if (user != null) {
